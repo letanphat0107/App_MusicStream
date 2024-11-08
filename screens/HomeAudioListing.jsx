@@ -183,7 +183,7 @@ export default function HomeAudioListing() {
           <Text style={styles.iconTitle}>Home</Text>
         </View>
         <View style={styles.iconContainer}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={()=>navigation.navigate('AudioListingSearchResults')}>
             <Search style={styles.icon} />
           </TouchableOpacity>
           <Text style={styles.iconTitle}>Search</Text>
