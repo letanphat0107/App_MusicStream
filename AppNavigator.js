@@ -12,6 +12,8 @@ import SuggestionsDetails from "./screens/SuggestionsDetails";
 import Songs from "./screens/Songs";
 import NewTag from "./screens/NewTag";
 import AddPlaylistScreen from "./screens/AddPlaylistScreen";
+import ArtistProfile from "./screens/ArtistProfile";
+import FeedAudioListing from "./screens/FeedAudioListing";
 
 const Stack = createStackNavigator();
 
@@ -34,6 +36,11 @@ function AppNavigator() {
         name="MyLibrary"
         component={MyLibrary}
         options={{ title: "My Library" }}
+      />
+      <Stack.Screen
+        name="FeedAudioListing"
+        component={FeedAudioListing}
+        options={{ title: "Feed" }}
       />
       <Stack.Screen
         name="ChartsList"
@@ -84,6 +91,11 @@ function AppNavigator() {
         name="AddPlaylist"
         component={AddPlaylistScreen}
         options={{ title: "Add New Playlist" }}
+      />
+      <Stack.Screen
+        name="ArtistProfile"
+        component={ArtistProfile}
+        options={{ title: "Artist Profile" }}
       />
     </Stack.Navigator>
   );

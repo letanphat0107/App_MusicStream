@@ -28,6 +28,7 @@ export default function HomeAudioListing() {
     { key: "10", image: require("../images/HomeAudioListing/Image39.png"), title: "Jennifer Wilson" },
     { key: "11", image: require("../images/HomeAudioListing/Image40.png"), title: "Elizabeth Hall" },
     { key: "12", image: require("../images/HomeAudioListing/Image41.png"), title: "Anthony Bourdain" },
+    { key: "13", image: require("../images/ArtistProfile/Image63.png"), title: "Ryan Young" },
   ];
 
   const handleSuggestionPress = (item) => {
@@ -81,13 +82,13 @@ export default function HomeAudioListing() {
   );
 
   const renderItem4 = ({ item }) => (
-    <View style={styles.itemContainer}>
+    <TouchableOpacity onPress={() => navigation.navigate('ArtistProfile', { artist: item })} style={styles.itemContainer}>
       <Image source={item.image} style={styles.itemImage3} />
       <Text style={styles.itemTitle1}>{item.title}</Text>
       <TouchableOpacity style={styles.followButton}>
         <Text style={styles.followButtonText}>Follow</Text>
       </TouchableOpacity>
-    </View>
+    </TouchableOpacity>
   );
 
   return (
@@ -188,7 +189,7 @@ export default function HomeAudioListing() {
           <Text style={styles.iconTitle}>Search</Text>
         </View>
         <View style={styles.iconContainer}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={()=> navigation.navigate('FeedAudioListing')}>
             <Newspaper style={styles.icon} />
           </TouchableOpacity>
           <Text style={styles.iconTitle}>Feed</Text>
