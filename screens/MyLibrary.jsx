@@ -112,6 +112,32 @@ export default function MyLibrary() {
           </View>
         ))}
       </ScrollView>
+      <View style={styles.khoangCach5}> 
+        <View style={styles.iconContainer}>
+          <TouchableOpacity>
+            <House style={styles.icon} />
+          </TouchableOpacity>
+          <Text style={styles.iconTitle}>Home</Text>
+        </View>
+        <View style={styles.iconContainer}>
+          <TouchableOpacity>
+            <Search style={styles.icon} />
+          </TouchableOpacity>
+          <Text style={styles.iconTitle}>Search</Text>
+        </View>
+        <View style={styles.iconContainer}>
+          <TouchableOpacity onPress={()=> navigation.navigate('FeedAudioListing')}>
+            <Newspaper style={styles.icon} />
+          </TouchableOpacity>
+          <Text style={styles.iconTitle}>Feed</Text>
+        </View>
+        <View style={styles.iconContainer}>
+          <TouchableOpacity onPress={() => navigation.navigate('MyLibrary')}>
+            <Library style={styles.icon} />
+          </TouchableOpacity>
+          <Text style={styles.iconTitle}>Library</Text>
+        </View>
+      </View>
     </View>
   );
 }
