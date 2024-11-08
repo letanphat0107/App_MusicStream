@@ -1,4 +1,4 @@
-import { Search, Heart, ChevronRight } from 'lucide-react-native';
+import { Search, Heart, ChevronRight,House,Newspaper,Library } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -39,7 +39,7 @@ const data = [
 export default function MyLibrary() {
   const navigation = useNavigation();  
   const [favorites, setFavorites] = useState(data.map(() => false));
-  const [isFollowing, setIsFollowing] = useState(false); // State để quản lý trạng thái follow
+  const [isFollowing, setIsFollowing] = useState(false);
 
   const toggleFavorite = (index) => {
     const newFavorites = [...favorites];
@@ -48,7 +48,7 @@ export default function MyLibrary() {
   };
 
   const toggleFollow = () => {
-    setIsFollowing(!isFollowing); // Toggle trạng thái follow
+    setIsFollowing(!isFollowing); 
   };
 
   const handleNavigation = (screen) => {
@@ -114,7 +114,7 @@ export default function MyLibrary() {
       </ScrollView>
       <View style={styles.khoangCach5}> 
         <View style={styles.iconContainer}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={()=>navigation.navigate('HomeAudioListing')}>
             <House style={styles.icon} />
           </TouchableOpacity>
           <Text style={styles.iconTitle}>Home</Text>
@@ -148,6 +148,24 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingHorizontal: 15,
     backgroundColor: '#f9f9f9', 
+  },
+  iconContainer: {
+    alignItems: 'center',
+  },
+  icon: {
+    color: 'white',
+    fontSize: 30,
+  },
+  iconTitle: {
+    fontSize: 12,
+    color: 'white',
+  },
+  khoangCach5: {
+    flexDirection: 'row',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    backgroundColor: "#231b2e",
+    justifyContent: 'space-between',
   },
   cungDong: {
     flexDirection: 'row',

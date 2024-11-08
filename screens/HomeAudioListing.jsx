@@ -177,7 +177,7 @@ export default function HomeAudioListing() {
       
       <View style={styles.khoangCach5}> 
         <View style={styles.iconContainer}>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={()=>navigation.navigate('HomeAudioListing')}>
             <House style={styles.icon} />
           </TouchableOpacity>
           <Text style={styles.iconTitle}>Home</Text>
