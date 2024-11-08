@@ -1,30 +1,40 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, TextInput, FlatList, Animated } from 'react-native';
 
 export default function NewTag() {
   const [tags, setTags] = useState([]);
-  const [newTag, setNewTag] = useState(''); 
-
+  const [newTag, setNewTag] = useState('');
+  const [fadeAnim] = useState(new Animated.Value(0));
   const handleAddTag = () => {
-    if (newTag.trim() !== '') {
+    if (newTag.trim() !== '' && !tags.includes(newTag.trim())) {
       setTags([...tags, newTag.trim()]);
-      setNewTag(''); 
+      setNewTag('');
+      fadeIn(); // Kích hoạt hiệu ứng mờ dần
     }
   };
 
+  const fadeIn = () => {
+    fadeAnim.setValue(0);
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 500,
+      useNativeDriver: true,
+    }).start();
+  };
+
   const handleRemoveTag = (tag) => {
-    setTags(tags.filter(item => item !== tag)); 
+    setTags(tags.filter(item => item !== tag));
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>New Tag</Text>
-      <Text style={styles.text}>Danh sách các tag mới của bạn sẽ hiển thị ở đây.</Text>
+      <Text style={styles.title}>Thẻ Mới</Text>
+      <Text style={styles.text}>Danh sách các thẻ mới của bạn sẽ hiển thị ở đây.</Text>
 
       <View style={styles.inputContainer}>
         <TextInput
           style={styles.input}
-          placeholder="Thêm tag mới"
+          placeholder="Thêm thẻ mới"
           value={newTag}
           onChangeText={setNewTag}
         />
@@ -36,12 +46,14 @@ export default function NewTag() {
       <FlatList
         data={tags}
         renderItem={({ item }) => (
-          <View style={styles.tagItem}>
-            <Text style={styles.tagText}>{item}</Text>
+          <Animated.View style={[styles.tagItem, { opacity: fadeAnim }]}>
+            <TouchableOpacity onPress={() => handleRemoveTag(item)} style={styles.tagTouchable}>
+              <Text style={styles.tagText}>{item}</Text>
+            </TouchableOpacity>
             <TouchableOpacity onPress={() => handleRemoveTag(item)}>
               <Text style={styles.removeText}>Xóa</Text>
             </TouchableOpacity>
-          </View>
+          </Animated.View>
         )}
         keyExtractor={(item, index) => index.toString()}
       />
@@ -100,12 +112,19 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
+    marginTop: 10,
   },
   tagText: {
     fontSize: 16,
+    color: '#333',
   },
   removeText: {
     color: 'red',
     fontWeight: 'bold',
+  },
+  tagTouchable: {
+    padding: 5,
+    borderRadius: 5,
+    backgroundColor: '#e0f7fa',
   },
 });
