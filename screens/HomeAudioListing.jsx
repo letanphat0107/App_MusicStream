@@ -1,10 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Image, StyleSheet, Text, TouchableOpacity, TextInput, ScrollView, FlatList } from 'react-native';
 import { BellRing, House, Library, Newspaper, Search } from "lucide-react-native";
 import { useNavigation } from '@react-navigation/native';
 
 export default function HomeAudioListing() {
   const navigation = useNavigation();
+  const [query, setQuery] = useState('');
+  const [favorites, setFavorites] = useState(new Set());
+  const [language, setLanguage] = useState('English');
 
   const data = [
     { key: "1", image: require("../images/HomeAudioListing/Container26.png") },
@@ -33,7 +36,8 @@ export default function HomeAudioListing() {
 
   const handleSuggestionPress = (item) => {
     navigation.navigate('SuggestionsDetails', { item });
-  }; 
+  };
+
   const handleSeeAllCharts = () => {
     navigation.navigate('ChartsList', { data: data2 });
   };
@@ -52,6 +56,18 @@ export default function HomeAudioListing() {
 
   const handlePressItem1 = (item) => {
     navigation.navigate('TrendingAlbums', { item });
+  };
+
+  const handleToggleFavorite = (itemKey) => {
+    setFavorites((prev) => {
+      const newFavorites = new Set(prev);
+      newFavorites.has(itemKey) ? newFavorites.delete(itemKey) : newFavorites.add(itemKey);
+      return newFavorites;
+    });
+  };
+
+  const handleLanguageChange = () => {
+    setLanguage(prevLang => prevLang === 'English' ? 'Vietnamese' : 'English');
   };
 
   const renderSuggestionItem = ({ item }) => (
@@ -95,27 +111,32 @@ export default function HomeAudioListing() {
     <>
       <View style={styles.container}>
         <Image source={require('../images/HomeAudioListing/Image36.png')} style={styles.styleHinhAnh} />
+        <TouchableOpacity onPress={handleLanguageChange}>
+          <Text style={styles.languageButton}>{language}</Text>
+        </TouchableOpacity>
         <TouchableOpacity>
           <BellRing style={styles.icon1} />
         </TouchableOpacity>
-        <Image source={require('../images/HomeAudioListing/Avatar3.png')} style={styles.styleHinhAnh} />
       </View>
 
       <View style={styles.khoangCach}>
-        <Text style={styles.mauNhat}>Good morning,</Text>
+        <Text style={styles.mauNhat}>{language === 'English' ? 'Good morning,' : 'Chào buổi sáng,'}</Text>
         <Text style={styles.inDam}>Ashley Scott</Text>
       </View>
+
       <View style={styles.txtFeildContainer}>
         <Search style={styles.searchIcon} />
         <TextInput
           style={styles.txtFeild}
-          placeholder="What you want to listen to"
+          placeholder={language === 'English' ? "What you want to listen to" : "Bạn muốn nghe gì"}
+          value={query}
+          onChangeText={setQuery}
         />
       </View>
-      
+
       <ScrollView style={styles.scrollView}>
         <View style={styles.khoangCach1}>
-          <Text style={styles.inDam1}>Suggestions for you</Text>
+          <Text style={styles.inDam1}>{language === 'English' ? 'Suggestions for you' : 'Gợi ý cho bạn'}</Text>
         </View>
         <FlatList
           data={data}
@@ -127,9 +148,9 @@ export default function HomeAudioListing() {
         />
 
         <View style={styles.khoangCach4}>
-          <Text style={styles.inDam}>Charts</Text>
+          <Text style={styles.inDam}>{language === 'English' ? 'Charts' : 'Bảng xếp hạng'}</Text>
           <TouchableOpacity onPress={handleSeeAllCharts}>
-            <Text style={styles.buttonSee}>See all</Text>
+            <Text style={styles.buttonSee}>{language === 'English' ? 'See all' : 'Xem tất cả'}</Text>
           </TouchableOpacity>
         </View>
 
@@ -143,9 +164,9 @@ export default function HomeAudioListing() {
         />
 
         <View style={styles.khoangCach4}>
-          <Text style={styles.inDam}>Trending albums</Text>
+          <Text style={styles.inDam}>{language === 'English' ? 'Trending albums' : 'Album thịnh hành'}</Text>
           <TouchableOpacity onPress={handleSeeAllAlbums}>
-            <Text style={styles.buttonSee}>See all</Text>
+            <Text style={styles.buttonSee}>{language === 'English' ? 'See all' : 'Xem tất cả'}</Text>
           </TouchableOpacity>
         </View>
 
@@ -159,9 +180,9 @@ export default function HomeAudioListing() {
         />
 
         <View style={styles.khoangCach4}>
-          <Text style={styles.inDam}>Popular artists</Text>
+          <Text style={styles.inDam}>{language === 'English' ? 'Popular artists' : 'Nghệ sĩ phổ biến'}</Text>
           <TouchableOpacity onPress={handleSeeAllArtists}>
-            <Text style={styles.buttonSee}>See all</Text>
+            <Text style={styles.buttonSee}>{language === 'English' ? 'See all' : 'Xem tất cả'}</Text>
           </TouchableOpacity>
         </View>
 
@@ -174,31 +195,31 @@ export default function HomeAudioListing() {
           style={styles.khoangCachData}
         />
       </ScrollView>
-      
-      <View style={styles.khoangCach5}> 
+
+      <View style={styles.khoangCach5}>
         <View style={styles.iconContainer}>
           <TouchableOpacity onPress={()=>navigation.navigate('HomeAudioListing')}>
             <House style={styles.icon} />
           </TouchableOpacity>
-          <Text style={styles.iconTitle}>Home</Text>
+          <Text style={styles.iconTitle}>{language === 'English' ? 'Home' : 'Trang chủ'}</Text>
         </View>
         <View style={styles.iconContainer}>
           <TouchableOpacity onPress={()=>navigation.navigate('AudioListingSearchResults')}>
             <Search style={styles.icon} />
           </TouchableOpacity>
-          <Text style={styles.iconTitle}>Search</Text>
+          <Text style={styles.iconTitle}>{language === 'English' ? 'Search' : 'Tìm kiếm'}</Text>
         </View>
         <View style={styles.iconContainer}>
           <TouchableOpacity onPress={()=> navigation.navigate('FeedAudioListing')}>
             <Newspaper style={styles.icon} />
           </TouchableOpacity>
-          <Text style={styles.iconTitle}>Feed</Text>
+          <Text style={styles.iconTitle}>{language === 'English' ? 'Feed' : 'Tin tức'}</Text>
         </View>
         <View style={styles.iconContainer}>
           <TouchableOpacity onPress={() => navigation.navigate('MyLibrary')}>
             <Library style={styles.icon} />
           </TouchableOpacity>
-          <Text style={styles.iconTitle}>Library</Text>
+          <Text style={styles.iconTitle}>{language === 'English' ? 'Library' : 'Thư viện'}</Text>
         </View>
       </View>
     </>
