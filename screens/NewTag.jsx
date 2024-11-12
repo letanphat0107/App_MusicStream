@@ -9,7 +9,7 @@ export default function NewTag() {
     if (newTag.trim() !== '' && !tags.includes(newTag.trim())) {
       setTags([...tags, newTag.trim()]);
       setNewTag('');
-      fadeIn(); // Kích hoạt hiệu ứng mờ dần
+      fadeIn();
     }
   };
 

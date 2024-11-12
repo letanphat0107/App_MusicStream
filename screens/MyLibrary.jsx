@@ -1,59 +1,93 @@
-import { Search, Heart, ChevronRight,House,Newspaper,Library } from 'lucide-react-native';
+import { Search, Heart, ChevronRight, House, Newspaper, Library, Play, Pause } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-
+import { Audio } from 'expo-av';
 const data = [
   {
     id: '1',
     title: 'FLOWER\nJessica Gonzalez\n2,1M . 3:36',
     image: require('../images/MyLibrary/Image101.png'), 
+    audio: require('../audio/qzt1sl5h1y.mp3'),
   },
   {
     id: '2',
     title: 'Shape of You\nAnthony Taylor\n68M . 03:35',
     image: require('../images/MyLibrary/Image102.png'), 
+    audio: require('../audio/qzt1sl5h1y.mp3'),
   },
   {
     id: '3',
     title: 'Blingding Lights\nAshley Scott . 4 songs',
     image: require('../images/MyLibrary/Image103.png'), 
+    audio: require('../audio/qzt1sl5h1y.mp3'),
   },
   {
     id: '4',
     title: 'Levitating\nAnthony Taylor\n9M . 07:48',
     image: require('../images/MyLibrary/Image104.png'), 
+    audio: require('../audio/qzt1sl5h1y.mp3'),
   },
   {
     id: '5',
     title: 'Astronaut in the Ocean\nPedro Moreno\n23M . 3:36',
     image: require('../images/MyLibrary/Image105.png'), 
+    audio: require('../audio/qzt1sl5h1y.mp3'),
   },
   {
     id: '6',
     title: 'Dynamite\nElena Jimeneez\n10M . 06:22',
     image: require('../images/MyLibrary/Image106.png'), 
+    audio: require('../audio/qzt1sl5h1y.mp3'),
   },
 ];
 
 export default function MyLibrary() {
-  const navigation = useNavigation();  
+  const navigation = useNavigation();
   const [favorites, setFavorites] = useState(data.map(() => false));
   const [isFollowing, setIsFollowing] = useState(false);
+  const [currentSong, setCurrentSong] = useState(null);
+  const [sound, setSound] = useState(null);
 
   const toggleFavorite = (index) => {
     const newFavorites = [...favorites];
-    newFavorites[index] = !newFavorites[index]; 
+    newFavorites[index] = !newFavorites[index];
     setFavorites(newFavorites);
   };
 
   const toggleFollow = () => {
-    setIsFollowing(!isFollowing); 
+    setIsFollowing(!isFollowing);
   };
 
   const handleNavigation = (screen) => {
     navigation.navigate(screen);
   };
+
+  const playSong = async (index) => {
+    // Nếu đang phát nhạc, dừng lại
+    if (sound) {
+      await sound.unloadAsync();
+      setSound(null);
+      if (currentSong === index) {
+        setCurrentSong(null); // Tắt nhạc nếu nhấn lại vào cùng một bài
+        return;
+      }
+    }
+
+    // Phát bài hát mới
+    const { sound: newSound } = await Audio.Sound.createAsync(data[index].audio);
+    setSound(newSound);
+    setCurrentSong(index);
+    await newSound.playAsync();
+  };
+
+  React.useEffect(() => {
+    return sound
+      ? () => {
+          sound.unloadAsync(); // Giải phóng âm thanh khi component bị huỷ
+        }
+      : undefined;
+  }, [sound]);
 
   return (
     <View style={styles.container}>
@@ -96,25 +130,33 @@ export default function MyLibrary() {
       <ScrollView showsVerticalScrollIndicator={false} style={styles.favoritesContainer}>
         {data.map((item, index) => (
           <View key={item.id} style={styles.favoriteItem}>
-            <TouchableOpacity style={styles.favoriteButton} onPress={() => toggleFavorite(index)}>
+            <TouchableOpacity style={styles.favoriteButton} onPress={() => playSong(index)}>
               <Image source={item.image} style={styles.favoriteImage} />
               <View style={styles.favoriteTextContainer}>
                 <Text style={styles.favoriteText}>{item.title}</Text>
               </View>
               <TouchableOpacity onPress={() => toggleFavorite(index)}>
                 {favorites[index] ? (
-                  <ChevronRight style={styles.favoriteIcon} />
-                ) : (
                   <Heart style={styles.favoriteIcon} />
+                ) : (
+                  <ChevronRight style={styles.favoriteIcon} />
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => playSong(index)}>
+                {currentSong === index ? (
+                  <Pause style={styles.favoriteIcon} />
+                ) : (
+                  <Play style={styles.favoriteIcon} />
                 )}
               </TouchableOpacity>
             </TouchableOpacity>
           </View>
         ))}
       </ScrollView>
-      <View style={styles.khoangCach5}> 
+
+      <View style={styles.khoangCach5}>
         <View style={styles.iconContainer}>
-          <TouchableOpacity onPress={()=>navigation.navigate('HomeAudioListing')}>
+          <TouchableOpacity onPress={() => navigation.navigate('HomeAudioListing')}>
             <House style={styles.icon} />
           </TouchableOpacity>
           <Text style={styles.iconTitle}>Home</Text>
@@ -126,7 +168,7 @@ export default function MyLibrary() {
           <Text style={styles.iconTitle}>Search</Text>
         </View>
         <View style={styles.iconContainer}>
-          <TouchableOpacity onPress={()=> navigation.navigate('FeedAudioListing')}>
+          <TouchableOpacity onPress={() => navigation.navigate('FeedAudioListing')}>
             <Newspaper style={styles.icon} />
           </TouchableOpacity>
           <Text style={styles.iconTitle}>Feed</Text>
@@ -186,10 +228,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: 'gray',
     marginTop: 5,
-  },
-  icon: {
-    color: 'gray',
-    fontSize: 30,
   },
   buttonContainer: {
     flexDirection: 'row', 
@@ -262,13 +300,9 @@ const styles = StyleSheet.create({
     marginLeft: 10, 
   },
   favoriteText: {
-    textAlign: 'left',
-    fontSize: 12,
-    marginRight: 5, 
+    fontWeight: 'bold',
   },
   favoriteIcon: {
-    color: '#ff1b6b',
-    fontSize: 20,
     marginLeft: 10,
   },
 });
