@@ -15,6 +15,7 @@ import AddPlaylistScreen from "./screens/AddPlaylistScreen";
 import ArtistProfile from "./screens/ArtistProfile";
 import FeedAudioListing from "./screens/FeedAudioListing";
 import AudioListingSearchResults from "./screens/AudioListingSearchResults";
+import PlayerScreen from "./screens/PlayerScreen";
 
 const Stack = createStackNavigator();
 
@@ -102,6 +103,11 @@ function AppNavigator() {
         name="AudioListingSearchResults"
         component={AudioListingSearchResults}
         options={{ title: "Search Results" }}
+      />
+      <Stack.Screen
+        name="PlayerScreen"
+        component={PlayerScreen}
+        options={{ title: "Player" }}
       />
     </Stack.Navigator>
   );
