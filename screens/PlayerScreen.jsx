@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, Alert, Animated } from 'react-native';
+import { View, Text, TouchableOpacity, Image, StyleSheet, Alert, Animated, ImageBackground, ActivityIndicator } from 'react-native';
 import { Audio } from 'expo-av';
 import Slider from '@react-native-community/slider';
 import { Play, Pause, ChevronRight, ChevronLeft, Shuffle, Repeat, FastForward, Rewind, Volume } from 'lucide-react-native';
@@ -141,110 +141,105 @@ export default function PlayerScreen({ route }) {
 
   return (
     <View style={styles.container}>
-      {/* Rotating Avatar with Circular Border */}
-      <Animated.View style={styles.circleContainer}>
-        <Animated.Image
-          source={song.image}
-          style={[ 
-            styles.songImage,
-            {
-              transform: [
-                {
-                  rotate: rotation.interpolate({
-                    inputRange: [0, 1],
-                    outputRange: ['0deg', '360deg'], // Rotate from 0 to 360 degrees
-                  }),
-                },
-              ],
-            },
-          ]}
-        />
-      </Animated.View>
-      <Text style={styles.songTitle}>{song.title}</Text>
-      <Text style={styles.songArtist}>{song.artist}</Text>
-      <Text style={styles.songDuration}>
-        {formatDuration(position)} / {formatDuration(duration)}
-      </Text>
-      <Slider
-        style={styles.slider}
-        minimumValue={0}
-        maximumValue={duration}
-        value={position}
-        onValueChange={async (value) => {
-          setPosition(value);
-          await soundRef.current.setPositionAsync(value);
-        }}
-        minimumTrackTintColor="#FF6347"
-        maximumTrackTintColor="#FFFFFF"
-        thumbTintColor="#FF6347"
-      />
-      <View style={styles.controls}>
-        {/* Skip backward button */}
-        <TouchableOpacity onPress={skipBackward} disabled={disableButtons}>
-          <ChevronLeft color="white" size={45} />
-        </TouchableOpacity>
-        
-        {/* Play/Pause button */}
-        <TouchableOpacity onPress={togglePlayback} disabled={disableButtons}>
-          {isPlaying ? <Pause color="white" size={60} /> : <Play color="white" size={60} />}
-        </TouchableOpacity>
-        
-        {/* Skip forward button */}
-        <TouchableOpacity onPress={skipForward} disabled={disableButtons}>
-          <ChevronRight color="white" size={45} />
-        </TouchableOpacity>
-      </View>
-      <View style={styles.extraControls}>
-        {/* Shuffle button */}
-        <TouchableOpacity onPress={toggleShuffle} disabled={disableButtons}>
-          <Shuffle color={isShuffle ? 'yellow' : 'white'} size={40} />
-        </TouchableOpacity>
-
-        {/* Repeat button */}
-        <TouchableOpacity onPress={toggleRepeat} disabled={disableButtons}>
-          <Repeat color={isRepeat ? 'yellow' : 'white'} size={40} />
-        </TouchableOpacity>
-
-        {/* Rewind button */}
-        <TouchableOpacity onPress={rewind} disabled={disableButtons}>
-          <Rewind color="white" size={40} />
-        </TouchableOpacity>
-
-        {/* Fast forward button */}
-        <TouchableOpacity onPress={fastForward} disabled={disableButtons}>
-          <FastForward color="white" size={40} />
-        </TouchableOpacity>
-      </View>
-      
-      {/* Volume control button */}
-      <TouchableOpacity
-        style={styles.volumeButton}
-        onPress={() => setShowVolumeControl(!showVolumeControl)}
-        disabled={disableButtons}
+      <ImageBackground
+        source={song.image}
+        style={styles.backgroundImage}
+        blurRadius={10}
       >
-        <Volume color="white" size={40} />
-      </TouchableOpacity>
-
-      {/* Volume control slider */}
-      {showVolumeControl && (
-        <View style={styles.volumeControl}>
+        <View style={styles.overlay}>
+          {/* Rotating Avatar with Circular Border */}
+          <Animated.View style={styles.circleContainer}>
+            <Animated.Image
+              source={song.image}
+              style={[
+                styles.songImage,
+                {
+                  transform: [
+                    {
+                      rotate: rotation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ['0deg', '360deg'],
+                      }),
+                    },
+                  ],
+                },
+              ]}
+            />
+          </Animated.View>
+          <Text style={styles.songTitle}>{song.title}</Text>
+          <Text style={styles.songArtist}>{song.artist}</Text>
+          <Text style={styles.songDuration}>
+            {formatDuration(position)} / {formatDuration(duration)}
+          </Text>
           <Slider
             style={styles.slider}
             minimumValue={0}
-            maximumValue={1}
-            value={volume}
+            maximumValue={duration}
+            value={position}
             onValueChange={async (value) => {
-              setVolume(value);
-              if (soundRef.current) {
-                await soundRef.current.setVolumeAsync(value);
-              }
+              setPosition(value);
+              await soundRef.current.setPositionAsync(value);
             }}
             minimumTrackTintColor="#FF6347"
             maximumTrackTintColor="#FFFFFF"
             thumbTintColor="#FF6347"
           />
+          {isBuffering && (
+            <ActivityIndicator size="large" color="#FF6347" style={styles.loadingIndicator} />
+          )}
+          <View style={styles.controls}>
+            <TouchableOpacity onPress={skipBackward} disabled={disableButtons}>
+              <ChevronLeft color="white" size={45} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={togglePlayback} disabled={disableButtons}>
+              {isPlaying ? <Pause color="white" size={60} /> : <Play color="white" size={60} />}
+            </TouchableOpacity>
+            <TouchableOpacity onPress={skipForward} disabled={disableButtons}>
+              <ChevronRight color="white" size={45} />
+            </TouchableOpacity>
+          </View>
+          <View style={styles.extraControls}>
+            <TouchableOpacity onPress={toggleShuffle} disabled={disableButtons}>
+              <Shuffle color={isShuffle ? 'yellow' : 'white'} size={40} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={toggleRepeat} disabled={disableButtons}>
+              <Repeat color={isRepeat ? 'yellow' : 'white'} size={40} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={rewind} disabled={disableButtons}>
+              <Rewind color="white" size={40} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={fastForward} disabled={disableButtons}>
+              <FastForward color="white" size={40} />
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity
+            style={styles.volumeButton}
+            onPress={() => setShowVolumeControl(!showVolumeControl)}
+            disabled={disableButtons}
+          >
+            <Volume color="white" size={40} />
+          </TouchableOpacity>
+          {showVolumeControl && (
+            <View style={styles.volumeControl}>
+              <Slider
+                style={styles.slider}
+                minimumValue={0}
+                maximumValue={1}
+                value={volume}
+                onValueChange={async (value) => {
+                  setVolume(value);
+                  if (soundRef.current) {
+                    await soundRef.current.setVolumeAsync(value);
+                  }
+                }}
+                minimumTrackTintColor="#FF6347"
+                maximumTrackTintColor="#FFFFFF"
+                thumbTintColor="#FF6347"
+              />
+            </View>
+          )}
         </View>
-      )}
+      </ImageBackground>
     </View>
   );
 }
@@ -257,30 +252,51 @@ const styles = StyleSheet.create({
     backgroundColor: '#181818',
     paddingHorizontal: 20,
   },
+  backgroundImage: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+  },
   circleContainer: {
     width: 250,
     height: 250,
     borderRadius: 125,
-    overflow: 'hidden',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 20,
-    borderWidth: 2,
+    borderWidth: 4,
     borderColor: '#FF6347',
+    overflow: 'hidden',
+    marginBottom: 20,
   },
   songImage: {
     width: '100%',
     height: '100%',
+    borderRadius: 125,
+    borderWidth: 4,
+    borderColor: '#FF6347',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 6,
   },
   songTitle: {
     fontSize: 24,
     color: 'white',
+    fontWeight: 'bold',
     marginBottom: 10,
   },
   songArtist: {
     fontSize: 18,
     color: 'gray',
     marginBottom: 10,
+    fontStyle: 'italic',
   },
   songDuration: {
     fontSize: 16,
@@ -288,26 +304,37 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   slider: {
-    width: '100%',
+    width: '80%',
     height: 40,
+    marginBottom: 20,
   },
   controls: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
     marginVertical: 20,
   },
   extraControls: {
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-evenly',
     alignItems: 'center',
     marginBottom: 20,
   },
+  loadingIndicator: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -30 }, { translateY: -30 }],
+  },
   volumeButton: {
-    marginTop: 20,
+    position: 'absolute',
+    bottom: 40,
+    right: 20,
   },
   volumeControl: {
-    width: '80%',
-    marginTop: 20,
+    position: 'absolute',
+    bottom: 100,
+    right: 20,
+    width: 200,
   },
 });

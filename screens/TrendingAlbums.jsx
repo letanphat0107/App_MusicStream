@@ -1,10 +1,18 @@
 import React, { useState } from 'react';
 import { View, Image, Text, StyleSheet, ScrollView, TouchableOpacity, FlatList, Alert } from 'react-native';
-import { Heart, Share, Download, Play } from 'lucide-react-native';
+import { Heart, Share, Download, Play, Pause, SkipForward, Shuffle, Repeat, PlusCircle } from 'lucide-react-native';
+import Slider from '@react-native-community/slider';
 
 export default function TrendingAlbums({ route }) {
   const { item } = route.params;
   const [liked, setLiked] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTrack, setCurrentTrack] = useState(null);
+  const [volume, setVolume] = useState(0.5);
+  const [isShuffled, setIsShuffled] = useState(false);
+  const [isRepeated, setIsRepeated] = useState(false);
+  const [trackProgress, setTrackProgress] = useState(0);
+  const [queue, setQueue] = useState([]);
 
   const sampleSongs = [
     { id: '1', title: 'Track 1', artist: 'Artist A', duration: '3:45' },
@@ -25,8 +33,45 @@ export default function TrendingAlbums({ route }) {
     Alert.alert("Download", `Downloading ${item.title}`);
   };
 
+  const handlePlayPause = () => {
+    setIsPlaying(!isPlaying);
+    Alert.alert(isPlaying ? "Paused" : "Now Playing", `${currentTrack.title} - ${currentTrack.artist}`);
+  };
+
   const handlePlaySong = (song) => {
+    setCurrentTrack(song);
+    setIsPlaying(true);
+    setTrackProgress(0); // Reset track progress when a new song is played
     Alert.alert("Now Playing", `${song.title} - ${song.artist}`);
+  };
+
+  const handleSkip = () => {
+    const currentIndex = sampleSongs.findIndex(song => song.id === currentTrack.id);
+    const nextSong = sampleSongs[(currentIndex + 1) % sampleSongs.length];
+    setCurrentTrack(nextSong);
+    setTrackProgress(0); // Reset track progress
+    Alert.alert("Next Track", `${nextSong.title} - ${nextSong.artist}`);
+  };
+
+  const handleShuffle = () => {
+    setIsShuffled(!isShuffled);
+    Alert.alert(isShuffled ? "Shuffle Off" : "Shuffle On", "Shuffle the playlist.");
+  };
+
+  const handleRepeat = () => {
+    setIsRepeated(!isRepeated);
+    Alert.alert(isRepeated ? "Repeat Off" : "Repeat On", "The track will repeat.");
+  };
+
+  const handleAddToQueue = () => {
+    if (currentTrack) {
+      setQueue([...queue, currentTrack]);
+      Alert.alert("Added to Queue", `${currentTrack.title} has been added to your queue.`);
+    }
+  };
+
+  const handleAddToPlaylist = () => {
+    Alert.alert("Added to Playlist", `${item.title} has been added to your playlist.`);
   };
 
   const renderSongItem = ({ item }) => (
@@ -69,6 +114,51 @@ export default function TrendingAlbums({ route }) {
           <Download style={styles.actionIcon} />
           <Text style={styles.actionText}>Download</Text>
         </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton} onPress={handleAddToPlaylist}>
+          <PlusCircle style={styles.actionIcon} />
+          <Text style={styles.actionText}>Add to Playlist</Text>
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.playerControls}>
+        <TouchableOpacity onPress={handleShuffle} style={styles.controlButton}>
+          <Shuffle style={styles.controlIcon} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleSkip} style={styles.controlButton}>
+          <SkipForward style={styles.controlIcon} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handlePlayPause} style={styles.controlButton}>
+          {isPlaying ? (
+            <Pause style={styles.controlIcon} />
+          ) : (
+            <Play style={styles.controlIcon} />
+          )}
+        </TouchableOpacity>
+        <TouchableOpacity onPress={handleRepeat} style={styles.controlButton}>
+          <Repeat style={styles.controlIcon} />
+        </TouchableOpacity>
+      </View>
+
+      <View style={styles.volumeControl}>
+        <Text style={styles.volumeText}>Volume</Text>
+        <Slider
+          value={volume}
+          onValueChange={setVolume}
+          minimumValue={0}
+          maximumValue={1}
+          style={styles.slider}
+        />
+      </View>
+
+      <View style={styles.trackProgress}>
+        <Text style={styles.trackProgressText}>{`Track Progress: ${(trackProgress * 100).toFixed(0)}%`}</Text>
+        <Slider
+          value={trackProgress}
+          onValueChange={setTrackProgress}
+          minimumValue={0}
+          maximumValue={1}
+          style={styles.slider}
+        />
       </View>
 
       <Text style={styles.trackListTitle}>Track List</Text>
@@ -137,6 +227,39 @@ const styles = StyleSheet.create({
   },
   likedText: {
     color: '#e74c3c',
+  },
+  playerControls: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    marginVertical: 16,
+  },
+  controlButton: {
+    padding: 12,
+  },
+  controlIcon: {
+    color: '#4cd137',
+    fontSize: 30,
+  },
+  volumeControl: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  volumeText: {
+    fontSize: 16,
+    color: '#7f8c8d',
+    marginBottom: 8,
+  },
+  trackProgress: {
+    marginTop: 20,
+    alignItems: 'center',
+  },
+  trackProgressText: {
+    fontSize: 14,
+    color: '#7f8c8d',
+    marginBottom: 8,
+  },
+  slider: {
+    width: '80%',
   },
   trackListTitle: {
     fontSize: 18,

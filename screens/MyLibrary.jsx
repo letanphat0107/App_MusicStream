@@ -1,6 +1,6 @@
 import { Search, Heart, ChevronRight, House, Newspaper, Library, Play, Pause } from 'lucide-react-native';
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView, TextInput, Slider } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
 const data = [
@@ -17,35 +17,41 @@ const data = [
     audio: require('../audio/AnhKhongCanDam-CaoNamThanh-4039734.mp3'),
   },
   {
-    id: '3',
-    title: 'Blingding Lights\nAshley Scott\n4 songs',
-    image: require('../images/MyLibrary/Image103.png'),
-    audio: require('../audio/qzt1sl5h1y.mp3'),
-  },
-  {
-    id: '4',
-    title: 'Levitating\nAnthony Taylor\n9M . 07:48',
-    image: require('../images/MyLibrary/Image104.png'),
-    audio: require('../audio/qzt1sl5h1y.mp3'),
-  },
-  {
-    id: '5',
-    title: 'Astronaut in the Ocean\nPedro Moreno\n23M . 3:36',
-    image: require('../images/MyLibrary/Image105.png'),
-    audio: require('../audio/qzt1sl5h1y.mp3'),
-  },
-  {
-    id: '6',
-    title: 'Dynamite\nElena Jimeneez\n10M . 06:22',
-    image: require('../images/MyLibrary/Image106.png'),
-    audio: require('../audio/qzt1sl5h1y.mp3'),
-  },
+  id: '3',
+  title: 'Blingding Lights\nAshley Scott\n4 songs',
+  image: require('../images/MyLibrary/Image103.png'),
+  audio: require('../audio/qzt1sl5h1y.mp3'),
+},
+{
+  id: '4',
+  title: 'Levitating\nAnthony Taylor\n9M . 07:48',
+  image: require('../images/MyLibrary/Image104.png'),
+  audio: require('../audio/qzt1sl5h1y.mp3'),
+},
+{
+  id: '5',
+  title: 'Astronaut in the Ocean\nPedro Moreno\n23M . 3:36',
+  image: require('../images/MyLibrary/Image105.png'),
+  audio: require('../audio/qzt1sl5h1y.mp3'),
+},
+{
+  id: '6',
+  title: 'Dynamite\nElena Jimeneez\n10M . 06:22',
+  image: require('../images/MyLibrary/Image106.png'),
+  audio: require('../audio/qzt1sl5h1y.mp3'),
+},
+
 ];
 
 export default function MyLibrary() {
   const navigation = useNavigation();
   const [favorites, setFavorites] = useState(data.map(() => false));
   const [isFollowing, setIsFollowing] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [currentTrackIndex, setCurrentTrackIndex] = useState(null);
+  const [playbackProgress, setPlaybackProgress] = useState(0);
+  const audioPlayer = useRef(null);
 
   const toggleFavorite = (index) => {
     const newFavorites = [...favorites];
@@ -61,15 +67,40 @@ export default function MyLibrary() {
     setIsFollowing(!isFollowing);
   };
 
+  const togglePlayback = () => {
+    if (isPlaying) {
+      audioPlayer.current.pause();
+    } else {
+      audioPlayer.current.play();
+    }
+    setIsPlaying(!isPlaying);
+  };
+
+  const handleSearch = (text) => {
+    setSearchText(text);
+  };
+
+  const filteredData = data.filter(item =>
+    item.title.toLowerCase().includes(searchText.toLowerCase())
+  );
+
   return (
     <View style={styles.container}>
-      <View style={styles.cungDong}>
-        <Text style={styles.inDam}>Your Library</Text>
+      {/* Search Bar */}
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search Songs"
+          placeholderTextColor="#ddd"
+          value={searchText}
+          onChangeText={handleSearch}
+        />
         <TouchableOpacity>
           <Search style={styles.icon} />
         </TouchableOpacity>
       </View>
 
+      {/* Navigation Buttons */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Playlists')}>
           <Text style={styles.buttonText}>Playlists</Text>
@@ -88,26 +119,28 @@ export default function MyLibrary() {
         </TouchableOpacity>
       </View>
 
-      <View style={styles.cungDong1}>
-        <Image source={require('../images/MyLibrary/Image107.png')} style={styles.styleHinhAnh} />
+      {/* Artist Follow Section */}
+      <View style={styles.artistFollowSection}>
+        <Image source={require('../images/MyLibrary/Image107.png')} style={styles.artistImage} />
         <View style={styles.nameContainer}>
           <Text style={styles.artistName}>Mer Watson</Text>
           <Text style={styles.followersCount}>1.234K Followers</Text>
         </View>
         <TouchableOpacity
-          style={[styles.buttonFollow, isFollowing ? { backgroundColor: '#999' } : {}]}
+          style={[styles.followButton, isFollowing ? { backgroundColor: '#999' } : {}]}
           onPress={toggleFollow}>
           <Text style={styles.buttonText}>{isFollowing ? 'Following' : 'Follow'}</Text>
         </TouchableOpacity>
       </View>
 
-      <ScrollView showsVerticalScrollIndicator={false} style={styles.favoritesContainer}>
-        {data.map((item, index) => (
-          <View key={item.id} style={styles.favoriteItem}>
-            <TouchableOpacity style={styles.favoriteButton} onPress={() => navigateToPlayer(index)}>
-              <Image source={item.image} style={styles.favoriteImage} />
-              <View style={styles.favoriteTextContainer}>
-                <Text style={styles.favoriteText}>{item.title}</Text>
+      {/* Song List */}
+      <ScrollView showsVerticalScrollIndicator={false} style={styles.songListContainer}>
+        {filteredData.map((item, index) => (
+          <View key={item.id} style={styles.songItem}>
+            <TouchableOpacity style={styles.songButton} onPress={() => navigateToPlayer(index)}>
+              <Image source={item.image} style={styles.songImage} />
+              <View style={styles.songTextContainer}>
+                <Text style={styles.songText}>{item.title}</Text>
               </View>
             </TouchableOpacity>
             <TouchableOpacity onPress={() => toggleFavorite(index)}>
@@ -121,7 +154,27 @@ export default function MyLibrary() {
         ))}
       </ScrollView>
 
-      <View style={styles.khoangCach5}>
+      {/* Audio Player Controls */}
+      {isPlaying && (
+        <View style={styles.playerControls}>
+          <TouchableOpacity onPress={togglePlayback}>
+            <Pause style={styles.icon} />
+          </TouchableOpacity>
+          <Slider
+            style={styles.progressBar}
+            minimumValue={0}
+            maximumValue={100}
+            value={playbackProgress}
+            onValueChange={(value) => setPlaybackProgress(value)}
+          />
+          <TouchableOpacity onPress={togglePlayback}>
+            <Play style={styles.icon} />
+          </TouchableOpacity>
+        </View>
+      )}
+
+      {/* Bottom Navigation */}
+      <View style={styles.bottomNav}>
         <View style={styles.iconContainer}>
           <TouchableOpacity onPress={() => navigation.navigate('HomeAudioListing')}>
             <House style={styles.icon} />
@@ -158,39 +211,20 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     backgroundColor: '#181818',
   },
-  iconContainer: {
-    alignItems: 'center',
-  },
-  icon: {
-    color: 'white',
-    fontSize: 30,
-  },
-  iconTitle: {
-    fontSize: 12,
-    color: 'white',
-  },
-  khoangCach5: {
-    flexDirection: 'row',
-    paddingVertical: 8,
-    paddingHorizontal: 20,
-    backgroundColor: '#231b2e',
-    justifyContent: 'space-between',
-  },
-  cungDong: {
+  searchContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  cungDong1: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  inDam: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  searchInput: {
+    height: 40,
+    borderColor: '#ddd',
+    borderWidth: 1,
+    borderRadius: 25,
+    paddingLeft: 10,
+    marginRight: 10,
     color: 'white',
+    flex: 1,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -210,17 +244,15 @@ const styles = StyleSheet.create({
     color: 'white',
     fontWeight: 'bold',
   },
-  styleHinhAnh: {
+  artistFollowSection: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 15,
+  },
+  artistImage: {
     width: 50,
     height: 50,
     borderRadius: 25,
-  },
-  buttonFollow: {
-    width: 100,
-    padding: 10,
-    backgroundColor: 'black',
-    borderRadius: 25,
-    marginHorizontal: 5,
   },
   nameContainer: {
     flex: 1,
@@ -234,31 +266,65 @@ const styles = StyleSheet.create({
   followersCount: {
     color: 'gray',
   },
-  favoritesContainer: {
-    marginTop: 10,
+  followButton: {
+    padding: 10,
+    backgroundColor: 'black',
+    borderRadius: 25,
+    marginLeft: 10,
   },
-  favoriteItem: {
-    marginBottom: 10,
+  songListContainer: {
+    marginTop: 20,
+  },
+  songItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    marginBottom: 15,
   },
-  favoriteButton: {
+  songButton: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
   },
-  favoriteImage: {
+  songImage: {
     width: 50,
     height: 50,
     borderRadius: 10,
   },
-  favoriteTextContainer: {
-    flex: 1,
+  songTextContainer: {
     marginLeft: 10,
+    flex: 1,
   },
-  favoriteText: {
+  songText: {
     fontWeight: 'bold',
+    color: 'white',
+  },
+  playerControls: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 10,
+  },
+  progressBar: {
+    flex: 1,
+    marginHorizontal: 10,
+  },
+  bottomNav: {
+    flexDirection: 'row',
+    paddingVertical: 8,
+    paddingHorizontal: 20,
+    backgroundColor: '#231b2e',
+    justifyContent: 'space-between',
+  },
+  iconContainer: {
+    alignItems: 'center',
+  },
+  icon: {
+    color: 'white',
+    fontSize: 30,
+  },
+  iconTitle: {
+    fontSize: 12,
     color: 'white',
   },
 });

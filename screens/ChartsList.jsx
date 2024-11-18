@@ -7,6 +7,8 @@ const ChartsList = ({ route }) => {
   const [sortOption, setSortOption] = useState('alphabetical');
   const [refreshing, setRefreshing] = useState(false);
   const [selectedItems, setSelectedItems] = useState(new Set());
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 10;
 
   const handleSortChange = (option) => setSortOption(option);
 
@@ -22,10 +24,11 @@ const ChartsList = ({ route }) => {
       return 0;
     });
 
-  // Làm mới danh sách
+  // Pagination logic
+  const paginatedData = filteredData.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+
   const onRefresh = useCallback(() => {
     setRefreshing(true);
-    // Giả lập dữ liệu mới
     setTimeout(() => {
       setRefreshing(false);
     }, 2000);
@@ -39,6 +42,14 @@ const ChartsList = ({ route }) => {
       newSelectedItems.add(key);
     }
     setSelectedItems(newSelectedItems);
+  };
+
+  const clearSearch = () => setSearchText('');
+
+  const loadMoreItems = () => {
+    if (filteredData.length > page * itemsPerPage) {
+      setPage(page + 1);
+    }
   };
 
   const renderItem = ({ item }) => (
@@ -65,13 +76,19 @@ const ChartsList = ({ route }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Charts</Text>
+      
       {/* Input tìm kiếm */}
-      <TextInput
-        style={styles.searchBar}
-        placeholder="Search charts..."
-        value={searchText}
-        onChangeText={setSearchText}
-      />
+      <View style={styles.searchContainer}>
+        <TextInput
+          style={styles.searchBar}
+          placeholder="Search charts..."
+          value={searchText}
+          onChangeText={setSearchText}
+        />
+        <TouchableOpacity onPress={clearSearch} style={styles.clearButton}>
+          <Text style={styles.clearButtonText}>Clear</Text>
+        </TouchableOpacity>
+      </View>
 
       {/* Nút sắp xếp */}
       <View style={styles.sortContainer}>
@@ -86,14 +103,23 @@ const ChartsList = ({ route }) => {
       {/* Danh sách */}
       {filteredData.length > 0 ? (
         <FlatList
-          data={filteredData}
+          data={paginatedData}
           renderItem={renderItem}
           keyExtractor={(item) => item.key}
           contentContainerStyle={styles.list}
           refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          onEndReached={loadMoreItems}
+          onEndReachedThreshold={0.5}
         />
       ) : (
         <Text style={styles.noDataText}>No charts found. Please try another search.</Text>
+      )}
+
+      {/* Clear selection button */}
+      {selectedItems.size > 0 && (
+        <TouchableOpacity onPress={() => setSelectedItems(new Set())} style={styles.clearSelectionButton}>
+          <Text style={styles.clearSelectionText}>Clear Selection</Text>
+        </TouchableOpacity>
       )}
     </View>
   );
@@ -112,13 +138,29 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333',
   },
+  searchContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
   searchBar: {
     height: 40,
     borderColor: '#ccc',
     borderWidth: 1,
     borderRadius: 8,
     paddingHorizontal: 10,
-    marginBottom: 10,
+    flex: 1,
+  },
+  clearButton: {
+    marginLeft: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    backgroundColor: '#ff1b6b',
+    borderRadius: 20,
+  },
+  clearButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
   sortContainer: {
     flexDirection: 'row',
@@ -193,6 +235,18 @@ const styles = StyleSheet.create({
     color: 'gray',
     fontSize: 16,
     marginTop: 20,
+  },
+  clearSelectionButton: {
+    marginTop: 10,
+    paddingHorizontal: 15,
+    paddingVertical: 5,
+    backgroundColor: '#ff1b6b',
+    borderRadius: 20,
+    alignSelf: 'center',
+  },
+  clearSelectionText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 
