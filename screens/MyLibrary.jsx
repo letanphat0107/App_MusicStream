@@ -47,19 +47,16 @@ export default function MyLibrary() {
   const [favorites, setFavorites] = useState(data.map(() => false));
   const [isFollowing, setIsFollowing] = useState(false);
 
-  // Toggle trạng thái yêu thích
   const toggleFavorite = (index) => {
     const newFavorites = [...favorites];
     newFavorites[index] = !newFavorites[index];
     setFavorites(newFavorites);
   };
 
-  // Điều hướng đến PlayerScreen
   const navigateToPlayer = (index) => {
-    navigation.navigate('PlayerScreen', { song: data[index] });
+    navigation.navigate('PlayerScreen', { song: data[index], playlist: data });
   };
 
-  // Toggle theo dõi
   const toggleFollow = () => {
     setIsFollowing(!isFollowing);
   };
