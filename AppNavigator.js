@@ -16,19 +16,37 @@ import ArtistProfile from "./screens/ArtistProfile";
 import FeedAudioListing from "./screens/FeedAudioListing";
 import AudioListingSearchResults from "./screens/AudioListingSearchResults";
 import PlayerScreen from "./screens/PlayerScreen";
+import LoginScreen from "./screens/LoginScreen";
+import LoginForm from "./screens/LoginForm";
+import SignUp from "./screens/SingUpScreen";
 
 const Stack = createStackNavigator();
 
 function AppNavigator() {
   return (
     <Stack.Navigator
-      initialRouteName="HomeAudioListing"
+      initialRouteName="LoginScreen" // Đặt màn hình mặc định là LoginScreen
       screenOptions={{
         headerStyle: { backgroundColor: "#231b2e" },
         headerTintColor: "#fff",
         headerTitleStyle: { fontWeight: "bold" },
       }}
     >
+      <Stack.Screen
+        name="LoginScreen"
+        component={LoginScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen
+        name="LoginForm"
+        component={LoginForm}
+        options={{ title: "Login" }}
+      />
+      <Stack.Screen
+        name="SignUp"
+        component={SignUp}
+        options={{ title: "Sign Up" }}
+      />
       <Stack.Screen
         name="HomeAudioListing"
         component={HomeAudioListing}
