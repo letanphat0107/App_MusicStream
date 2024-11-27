@@ -17,29 +17,30 @@ const data = [
     audio: require('../audio/AnhKhongCanDam-CaoNamThanh-4039734.mp3'),
   },
   {
-    id: '3',
-    title: 'Blingding Lights\nAshley Scott\n4 songs',
-    image: require('../images/MyLibrary/Image103.png'),
-    audio: require('../audio/qzt1sl5h1y.mp3'),
-  },
-  {
-    id: '4',
-    title: 'Levitating\nAnthony Taylor\n9M . 07:48',
-    image: require('../images/MyLibrary/Image104.png'),
-    audio: require('../audio/qzt1sl5h1y.mp3'),
-  },
-  {
-    id: '5',
-    title: 'Astronaut in the Ocean\nPedro Moreno\n23M . 3:36',
-    image: require('../images/MyLibrary/Image105.png'),
-    audio: require('../audio/qzt1sl5h1y.mp3'),
-  },
-  {
-    id: '6',
-    title: 'Dynamite\nElena Jimeneez\n10M . 06:22',
-    image: require('../images/MyLibrary/Image106.png'),
-    audio: require('../audio/qzt1sl5h1y.mp3'),
-  },
+  id: '3',
+  title: 'Blingding Lights\nAshley Scott\n4 songs',
+  image: require('../images/MyLibrary/Image103.png'),
+  audio: require('../audio/qzt1sl5h1y.mp3'),
+},
+{
+  id: '4',
+  title: 'Levitating\nAnthony Taylor\n9M . 07:48',
+  image: require('../images/MyLibrary/Image104.png'),
+  audio: require('../audio/qzt1sl5h1y.mp3'),
+},
+{
+  id: '5',
+  title: 'Astronaut in the Ocean\nPedro Moreno\n23M . 3:36',
+  image: require('../images/MyLibrary/Image105.png'),
+  audio: require('../audio/qzt1sl5h1y.mp3'),
+},
+{
+  id: '6',
+  title: 'Dynamite\nElena Jimeneez\n10M . 06:22',
+  image: require('../images/MyLibrary/Image106.png'),
+  audio: require('../audio/qzt1sl5h1y.mp3'),
+},
+
 ];
 
 export default function MyLibrary() {

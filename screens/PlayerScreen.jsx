@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, Alert, Animated, ImageBackground, ActivityIndicator } from 'react-native';
 import { Audio } from 'expo-av';
 import Slider from '@react-native-community/slider';
-import { Play, Pause, ChevronRight, ChevronLeft, Repeat, FastForward, Rewind, Volume } from 'lucide-react-native';
+import { Play, Pause, ChevronRight, ChevronLeft, Shuffle, Repeat, FastForward, Rewind, Volume } from 'lucide-react-native';
 
 export default function PlayerScreen({ route }) {
   const { song, playlist } = route.params;
@@ -11,44 +11,23 @@ export default function PlayerScreen({ route }) {
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isBuffering, setIsBuffering] = useState(false);
+  const [isShuffle, setIsShuffle] = useState(false);
   const [isRepeat, setIsRepeat] = useState(false);
-  const [volume, setVolume] = useState(1);
-  const [showVolumeControl, setShowVolumeControl] = useState(false);
+  const [volume, setVolume] = useState(1); // Volume state (1 = max volume, 0 = min)
+  const [showVolumeControl, setShowVolumeControl] = useState(false); // Control visibility of the volume slider
   const soundRef = useRef();
-  const rotation = useRef(new Animated.Value(0)).current;
-  const waveAnimation = useRef(new Animated.Value(0)).current; // Wave animation
+  const rotation = useRef(new Animated.Value(0)).current; // Animated rotation value
 
   useEffect(() => {
-    setPosition(0);
-    setIsPlaying(false);
-    if (soundRef.current) {
-      soundRef.current.unloadAsync();
-    }
     loadSound();
 
-    // Looping rotation
+    // Start rotating the avatar when the component mounts
     Animated.loop(
       Animated.timing(rotation, {
         toValue: 1,
-        duration: 10000,
+        duration: 10000, // Complete one full rotation every 10 seconds
         useNativeDriver: true,
       })
-    ).start();
-
-    // Wave animation (moving water effect)
-    Animated.loop(
-      Animated.sequence([
-        Animated.timing(waveAnimation, {
-          toValue: 1,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-        Animated.timing(waveAnimation, {
-          toValue: 0,
-          duration: 500,
-          useNativeDriver: true,
-        }),
-      ])
     ).start();
 
     return () => {
@@ -62,7 +41,7 @@ export default function PlayerScreen({ route }) {
     try {
       const { sound, status } = await Audio.Sound.createAsync(
         song.audio,
-        { shouldPlay: isPlaying, volume },
+        { shouldPlay: isPlaying, positionMillis: position, volume },
         onPlaybackStatusUpdate
       );
       soundRef.current = sound;
@@ -79,9 +58,9 @@ export default function PlayerScreen({ route }) {
 
     if (status.didJustFinish) {
       if (isRepeat) {
-        soundRef.current.playAsync();
+        soundRef.current.playAsync(); // Replay the same song
       } else {
-        skipForward();
+        skipForward(); // Automatically skip to the next song when finished
       }
     }
   };
@@ -98,26 +77,23 @@ export default function PlayerScreen({ route }) {
       } catch (error) {
         Alert.alert('Error', 'Unable to toggle playback. Please try again later.');
       }
+    } else {
+      // If sound is not loaded, load it and play
+      await loadSound();
     }
   };
 
   const skipForward = async () => {
     try {
-      if (soundRef.current) {
-        await soundRef.current.stopAsync();
-        await soundRef.current.unloadAsync();
-      }
-
-      const currentIndex = playlist.findIndex(item => item.id === song.id);
-      const nextIndex = currentIndex + 1;
-
+      const nextIndex = isShuffle
+        ? Math.floor(Math.random() * playlist.length)
+        : playlist.findIndex(item => item.id === song.id) + 1;
       if (nextIndex < playlist.length) {
         const nextSong = playlist[nextIndex];
         setPosition(0);
         setIsPlaying(false);
         route.params.song = nextSong;
-      } else {
-        Alert.alert('End of playlist', 'There are no more songs to play.');
+        loadSound();
       }
     } catch (error) {
       Alert.alert('Error', 'Unable to skip forward. Please try again later.');
@@ -126,21 +102,13 @@ export default function PlayerScreen({ route }) {
 
   const skipBackward = async () => {
     try {
-      if (soundRef.current) {
-        await soundRef.current.stopAsync();
-        await soundRef.current.unloadAsync();
-      }
-
-      const currentIndex = playlist.findIndex(item => item.id === song.id);
-      const prevIndex = currentIndex - 1;
-
+      const prevIndex = playlist.findIndex(item => item.id === song.id) - 1;
       if (prevIndex >= 0) {
         const prevSong = playlist[prevIndex];
         setPosition(0);
         setIsPlaying(false);
         route.params.song = prevSong;
-      } else {
-        Alert.alert('Start of playlist', 'There are no previous songs to play.');
+        loadSound();
       }
     } catch (error) {
       Alert.alert('Error', 'Unable to skip backward. Please try again later.');
@@ -148,16 +116,18 @@ export default function PlayerScreen({ route }) {
   };
 
   const fastForward = () => {
-    const newPosition = Math.min(position + 10000, duration);
+    const newPosition = Math.min(position + 10000, duration); // Fast forward by 10 seconds
     setPosition(newPosition);
     soundRef.current.setPositionAsync(newPosition);
   };
 
   const rewind = () => {
-    const newPosition = Math.max(position - 10000, 0);
+    const newPosition = Math.max(position - 10000, 0); // Rewind by 10 seconds
     setPosition(newPosition);
     soundRef.current.setPositionAsync(newPosition);
   };
+
+  const toggleShuffle = () => setIsShuffle(!isShuffle);
 
   const toggleRepeat = () => setIsRepeat(!isRepeat);
 
@@ -171,32 +141,36 @@ export default function PlayerScreen({ route }) {
 
   return (
     <View style={styles.container}>
-      <ImageBackground source={song.image} style={styles.backgroundImage} blurRadius={10}>
+      <ImageBackground
+        source={song.image}
+        style={styles.backgroundImage}
+        blurRadius={10}
+      >
         <View style={styles.overlay}>
+          {/* Rotating Avatar with Circular Border */}
           <Animated.View style={styles.circleContainer}>
             <Animated.Image
               source={song.image}
-              style={[styles.songImage, {
-                transform: [{ rotate: rotation.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: ['0deg', '360deg']
-                })}]
-              }]}
-
+              style={[
+                styles.songImage,
+                {
+                  transform: [
+                    {
+                      rotate: rotation.interpolate({
+                        inputRange: [0, 1],
+                        outputRange: ['0deg', '360deg'],
+                      }),
+                    },
+                  ],
+                },
+              ]}
             />
-            <Animated.View style={[styles.waveEffect, 
-              {
-                transform: [
-                  { scale: waveAnimation.interpolate({ inputRange: [0, 1], outputRange: [1, 1.2] }) },
-                  { translateY: waveAnimation.interpolate({ inputRange: [0, 1], outputRange: [0, -5] }) }
-                ]
-              }
-            ]} />
           </Animated.View>
           <Text style={styles.songTitle}>{song.title}</Text>
           <Text style={styles.songArtist}>{song.artist}</Text>
-          <Text style={styles.songDuration}>{formatDuration(position)} / {formatDuration(duration)}</Text>
-          
+          <Text style={styles.songDuration}>
+            {formatDuration(position)} / {formatDuration(duration)}
+          </Text>
           <Slider
             style={styles.slider}
             minimumValue={0}
@@ -204,48 +178,47 @@ export default function PlayerScreen({ route }) {
             value={position}
             onValueChange={async (value) => {
               setPosition(value);
-              if (soundRef.current) {
-                await soundRef.current.setPositionAsync(value);
-              }
+              await soundRef.current.setPositionAsync(value);
             }}
-            minimumTrackTintColor="#1DB954"
+            minimumTrackTintColor="#FF6347"
             maximumTrackTintColor="#FFFFFF"
-            thumbTintColor="#1DB954"
+            thumbTintColor="#FF6347"
           />
-          
-          {isBuffering && <ActivityIndicator size="large" color="#FF6347" style={styles.loadingIndicator} />}
-
+          {isBuffering && (
+            <ActivityIndicator size="large" color="#FF6347" style={styles.loadingIndicator} />
+          )}
           <View style={styles.controls}>
-            <TouchableOpacity onPress={skipBackward} disabled={disableButtons} style={styles.button}>
+            <TouchableOpacity onPress={skipBackward} disabled={disableButtons}>
               <ChevronLeft color="white" size={45} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={togglePlayback} disabled={disableButtons} style={styles.button}>
+            <TouchableOpacity onPress={togglePlayback} disabled={disableButtons}>
               {isPlaying ? <Pause color="white" size={60} /> : <Play color="white" size={60} />}
             </TouchableOpacity>
-            <TouchableOpacity onPress={skipForward} disabled={disableButtons} style={styles.button}>
+            <TouchableOpacity onPress={skipForward} disabled={disableButtons}>
               <ChevronRight color="white" size={45} />
             </TouchableOpacity>
           </View>
-
           <View style={styles.extraControls}>
-            <TouchableOpacity onPress={toggleRepeat} disabled={disableButtons} style={styles.button}>
+            <TouchableOpacity onPress={toggleShuffle} disabled={disableButtons}>
+              <Shuffle color={isShuffle ? 'yellow' : 'white'} size={40} />
+            </TouchableOpacity>
+            <TouchableOpacity onPress={toggleRepeat} disabled={disableButtons}>
               <Repeat color={isRepeat ? 'yellow' : 'white'} size={40} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={rewind} disabled={disableButtons} style={styles.button}>
+            <TouchableOpacity onPress={rewind} disabled={disableButtons}>
               <Rewind color="white" size={40} />
             </TouchableOpacity>
-            <TouchableOpacity onPress={fastForward} disabled={disableButtons} style={styles.button}>
+            <TouchableOpacity onPress={fastForward} disabled={disableButtons}>
               <FastForward color="white" size={40} />
             </TouchableOpacity>
           </View>
-
           <TouchableOpacity
             style={styles.volumeButton}
             onPress={() => setShowVolumeControl(!showVolumeControl)}
+            disabled={disableButtons}
           >
-            <Volume color="white" size={35} />
+            <Volume color="white" size={40} />
           </TouchableOpacity>
-
           {showVolumeControl && (
             <View style={styles.volumeControl}>
               <Slider
@@ -259,9 +232,9 @@ export default function PlayerScreen({ route }) {
                     await soundRef.current.setVolumeAsync(value);
                   }
                 }}
-                minimumTrackTintColor="#1DB954"
+                minimumTrackTintColor="#FF6347"
                 maximumTrackTintColor="#FFFFFF"
-                thumbTintColor="#1DB954"
+                thumbTintColor="#FF6347"
               />
             </View>
           )}
@@ -272,30 +245,96 @@ export default function PlayerScreen({ route }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#181818' },
-  backgroundImage: { flex: 1, width: '100%', height: '100%' },
-  overlay: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  circleContainer: { width: 250, height: 250, borderRadius: 125, shadowColor: '#000', shadowOpacity: 0.8, shadowOffset: { width: 0, height: 10 }, shadowRadius: 20, position: 'relative' },
-  songImage: { width: '100%', height: '100%', borderRadius: 125, borderWidth: 5, borderColor: '#FF6347' },
-  waveEffect: { 
-    position: 'absolute',
-    top: 0, 
-    left: 0, 
-    right: 0, 
-    bottom: 0, 
-    borderRadius: 125, 
-    borderWidth: 2, 
-    borderColor: '#FF6347', 
-    opacity: 0.5 
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#181818',
+    paddingHorizontal: 20,
   },
-  songTitle: { color: '#FFFFFF', fontSize: 24, fontWeight: 'bold', marginTop: 10 },
-  songArtist: { color: '#AAAAAA', fontSize: 18 },
-  songDuration: { color: '#AAAAAA', fontSize: 16, marginTop: 5 },
-  slider: { width: '80%', marginTop: 20 },
-  controls: { flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', marginTop: 20 },
-  extraControls: { flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', marginTop: 20 },
-  volumeButton: { marginTop: 20 },
-  loadingIndicator: { position: 'absolute', top: '50%', left: '50%', marginLeft: -25, marginTop: -25 },
-  volumeControl: { position: 'absolute', bottom: 30, width: '80%', alignItems: 'center' },
-  button: { padding: 10, alignItems: 'center' },
+  backgroundImage: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+  },
+  overlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
+  },
+  circleContainer: {
+    width: 250,
+    height: 250,
+    borderRadius: 125,
+    borderWidth: 4,
+    borderColor: '#FF6347',
+    overflow: 'hidden',
+    marginBottom: 20,
+  },
+  songImage: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 125,
+    borderWidth: 4,
+    borderColor: '#FF6347',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.8,
+    shadowRadius: 6,
+  },
+  songTitle: {
+    fontSize: 24,
+    color: 'white',
+    fontWeight: 'bold',
+    marginBottom: 10,
+  },
+  songArtist: {
+    fontSize: 18,
+    color: 'gray',
+    marginBottom: 10,
+    fontStyle: 'italic',
+  },
+  songDuration: {
+    fontSize: 16,
+    color: 'white',
+    marginBottom: 20,
+  },
+  slider: {
+    width: '80%',
+    height: 40,
+    marginBottom: 20,
+  },
+  controls: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginVertical: 20,
+  },
+  extraControls: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  loadingIndicator: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: [{ translateX: -30 }, { translateY: -30 }],
+  },
+  volumeButton: {
+    position: 'absolute',
+    bottom: 40,
+    right: 20,
+  },
+  volumeControl: {
+    position: 'absolute',
+    bottom: 100,
+    right: 20,
+    width: 200,
+  },
 });

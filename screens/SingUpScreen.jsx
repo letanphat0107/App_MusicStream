@@ -12,7 +12,7 @@ const SignUpScreen = ({ navigation }) => {
     confirmPassword: '',
   });
 
-  const { addUser } = useContext(UserContext); // Truy cập hàm thêm người dùng
+  const { addUser } = useContext(UserContext);
 
   const handleInputChange = (name, value) => {
     setForm({ ...form, [name]: value });
@@ -61,21 +61,21 @@ const SignUpScreen = ({ navigation }) => {
       <Text style={styles.title}>Đăng ký tài khoản</Text>
 
       <TextInput
-        style={styles.input}
+        style={[styles.input, form.firstName ? styles.inputFocus : null]}
         placeholder="Họ"
         placeholderTextColor="#ccc"
         value={form.firstName}
         onChangeText={(value) => handleInputChange("firstName", value)}
       />
       <TextInput
-        style={styles.input}
+        style={[styles.input, form.lastName ? styles.inputFocus : null]}
         placeholder="Tên"
         placeholderTextColor="#ccc"
         value={form.lastName}
         onChangeText={(value) => handleInputChange("lastName", value)}
       />
       <TextInput
-        style={styles.input}
+        style={[styles.input, form.phone ? styles.inputFocus : null]}
         placeholder="Số điện thoại"
         placeholderTextColor="#ccc"
         keyboardType="phone-pad"
@@ -83,7 +83,7 @@ const SignUpScreen = ({ navigation }) => {
         onChangeText={(value) => handleInputChange("phone", value)}
       />
       <TextInput
-        style={styles.input}
+        style={[styles.input, form.email ? styles.inputFocus : null]}
         placeholder="Email (@gmail.com)"
         placeholderTextColor="#ccc"
         keyboardType="email-address"
@@ -91,7 +91,7 @@ const SignUpScreen = ({ navigation }) => {
         onChangeText={(value) => handleInputChange("email", value)}
       />
       <TextInput
-        style={styles.input}
+        style={[styles.input, form.password ? styles.inputFocus : null]}
         placeholder="Mật khẩu"
         placeholderTextColor="#ccc"
         secureTextEntry
@@ -99,7 +99,7 @@ const SignUpScreen = ({ navigation }) => {
         onChangeText={(value) => handleInputChange("password", value)}
       />
       <TextInput
-        style={styles.input}
+        style={[styles.input, form.confirmPassword ? styles.inputFocus : null]}
         placeholder="Nhập lại mật khẩu"
         placeholderTextColor="#ccc"
         secureTextEntry
@@ -139,6 +139,11 @@ const styles = StyleSheet.create({
     padding: 10,
     marginVertical: 5,
     borderRadius: 8,
+    borderWidth: 1,
+    borderColor: '#333',
+  },
+  inputFocus: {
+    borderColor: '#1DB954',
   },
   button: {
     backgroundColor: '#1DB954',
@@ -147,6 +152,7 @@ const styles = StyleSheet.create({
     borderRadius: 25,
     width: '100%',
     alignItems: 'center',
+    elevation: 5,  // Tạo hiệu ứng bóng mờ
   },
   buttonText: {
     color: '#fff',
