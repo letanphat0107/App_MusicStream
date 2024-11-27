@@ -20,6 +20,8 @@ import LoginScreen from "./screens/LoginScreen";
 import LoginForm from "./screens/LoginForm";
 import SignUp from "./screens/SingUpScreen";
 import LoginWithPhone from "./screens/LoginWithPhone";
+import OTPVerification from "./screens/OTPVerification";
+import LoginWithGoogle from "./screens/LoginWithGoogle";
 
 const Stack = createStackNavigator();
 
@@ -52,6 +54,16 @@ function AppNavigator() {
         name="LoginWithPhone"
         component={LoginWithPhone}
         options={{ title: "Login With Phone" }}
+      />
+      <Stack.Screen
+        name="OTPVerification"
+        component={OTPVerification}
+        options={{ title: "OTP Verification" }}
+      />
+      <Stack.Screen
+        name="LoginWithGoogle"
+        component={LoginWithGoogle}
+        options={{ title: "Login With Google" }}
       />
       <Stack.Screen
         name="HomeAudioListing"
