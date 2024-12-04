@@ -129,38 +129,38 @@ export default function PlaylistsDetails() {
 const sampleSongs = [
   {
     id: '1',
-    title: 'FLOWER\nJessica Gonzalez\n2,1M . 3:36',
-    image: require('../images/MyLibrary/Image101.png'),
+    title: 'Đào Nương\nHoàng Vương\n2,1M . 3:06',
+    image: require('../images/Avatar/daoNuong.jpg'),
     audio: require('../audio/DaoNuong.mp3'),
   },
   {
     id: '2',
-    title: 'Shape of You\nAnthony Taylor\n68M . 03:35',
-    image: require('../images/MyLibrary/Image102.png'),
+    title: 'Anh Không Can Đảm\nCao Nam Thành\n2,8M . 4:25',
+    image: require('../images/Avatar/anhKhongCanDam.jpg'),
     audio: require('../audio/AnhKhongCanDam-CaoNamThanh-4039734.mp3'),
   },
   {
   id: '3',
-  title: 'Blingding Lights\nAshley Scott\n4 songs',
-  image: require('../images/MyLibrary/Image103.png'),
+  title: 'Chỉ Là Không Cùng Nhau\nTăng Phúc, Trương Thảo Nhi\n4,8M . 3:52',
+  image: require('../images/Avatar/chiLaKhongCungNhau.jpg'),
   audio: require('../audio/ChiLaKhongCungNhau.mp3'),
 },
 {
   id: '4',
-  title: 'Levitating\nAnthony Taylor\n9M . 07:48',
-  image: require('../images/MyLibrary/Image104.png'),
+  title: 'Lạc Trôi\nSơn Tùng M-TP\n9M . 3.53',
+  image: require('../images/Avatar/lacTroi.jpg'),
   audio: require('../audio/LacTroi.mp3'),
 },
 {
   id: '5',
-  title: 'Astronaut in the Ocean\nPedro Moreno\n23M . 3:36',
-  image: require('../images/MyLibrary/Image105.png'),
+  title: 'Chỉ Bằng Cái Gật Đầu\nYan Nguyễn\n23M . 4:06',
+  image: require('../images/Avatar/chiBangCaiGatDau.jpg'),
   audio: require('../audio/ChiBangCaiGatDau.mp3'),
 },
 {
   id: '6',
-  title: 'Dynamite\nElena Jimeneez\n10M . 06:22',
-  image: require('../images/MyLibrary/Image106.png'),
+  title: 'Nói Có Khó Nhưng Vui\nYan Nguyễn\n10M . 4:12',
+  image: require('../images/Avatar/noiCoKhoNhungVui.jpg'),
   audio: require('../audio/ChiLaKhongCungNhau.mp3'),
 },
 
@@ -170,7 +170,7 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: '#f9f9f9',
     padding: 16,
-    marginBottom: 60, // Chừa không gian cho MusicControlBar
+    marginBottom: 60, 
   },
   cungDong: {
     flexDirection: 'row',

@@ -12,9 +12,9 @@ const data = [
   },
   {
     id: '2',
-    title: 'Anh Không Can Đảm\nCao Nam Thành\n2,8M . 4:25',
-    image: require('../images/Avatar/anhKhongCanDam.jpg'),
-    audio: require('../audio/AnhKhongCanDam-CaoNamThanh-4039734.mp3'),
+    title: 'Một Bước Yêu Vạn Dặm Đau\nMr.Siro\n8,8M . 4:58',
+    image: require('../images/Avatar/motBuocYeuVanDam.jpg'),
+    audio: require('../audio/motBuocYeuVanDamDau.mp3'),
   },
   {
   id: '3',
@@ -39,6 +39,24 @@ const data = [
   title: 'Nói Có Khó Nhưng Vui\nYan Nguyễn\n10M . 4:12',
   image: require('../images/Avatar/noiCoKhoNhungVui.jpg'),
   audio: require('../audio/ChiLaKhongCungNhau.mp3'),
+},
+{
+  id: '7',
+  title: 'Ngỡ Như Giấc Mơ\nChu Duyên\n1,2M . 3:58',
+  image: require('../images/Avatar/ngoNhuGiacMo.jpg'),
+  audio: require('../audio/ngoNhuGiacMo.mp3'),
+},  
+{
+  id: '8',
+  title: 'Ai Chung Tình Được Mãi\nĐinh Tùng Huy, ACV\n1,9M . 5:35',
+  image: require('../images/Avatar/aiChungTinhDuocMai.jpg'),
+  audio: require('../audio/aiChungTinhDuocMai.mp3'),
+},
+{
+  id: '9',
+  title: 'Anh Không Can Đảm\nCao Nam Thành\n2,8M . 4:25',
+  image: require('../images/Avatar/anhKhongCanDam.jpg'),
+  audio: require('../audio/AnhKhongCanDam-CaoNamThanh-4039734.mp3'),
 },
 
 ];

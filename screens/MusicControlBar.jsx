@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { Play, Pause, SkipBack, SkipForward } from "lucide-react-native";
+import { useNavigation } from "@react-navigation/native"; // Import useNavigation
 
 const MusicControlBar = ({
   currentSong,
@@ -9,6 +10,15 @@ const MusicControlBar = ({
   onNext,
   onPrevious,
 }) => {
+  const navigation = useNavigation(); // Initialize navigation
+
+  // Navigate to PlayerScreen when song information is pressed
+  const handleSongPress = () => {
+    if (currentSong) {
+      navigation.navigate("PlayerScreen", { song: currentSong }); // Pass currentSong as a parameter
+    }
+  };
+
   return (
     <View style={styles.controlBar}>
       {/* Previous Button */}
@@ -31,7 +41,7 @@ const MusicControlBar = ({
       </TouchableOpacity>
 
       {/* Song Information */}
-      <View style={styles.songInfo}>
+      <TouchableOpacity style={styles.songInfo} onPress={handleSongPress}>
         {currentSong ? (
           <>
             <Text style={styles.songTitle}>{currentSong.title}</Text>
@@ -40,7 +50,7 @@ const MusicControlBar = ({
         ) : (
           <Text style={styles.songTitle}>No song playing</Text>
         )}
-      </View>
+      </TouchableOpacity>
     </View>
   );
 };

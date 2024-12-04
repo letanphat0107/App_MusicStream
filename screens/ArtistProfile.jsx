@@ -354,6 +354,7 @@ const popularTracks = [
   {id: 5, name: 'Dynamite', artistName: 'Ryan Young', plays: '10M', duration: '06:22', image: require('../images/ArtistProfile/Image70.png'), audioUrl: require('../audio/ChiLaKhongCungNhau.mp3') },
 ];
 
+
 const albums = [
   { id: 1, title: 'ME', artist: 'Jessica Gonzalez', image: require('../images/ArtistProfile/Image71.png') },
   { id: 2, title: 'Magna nost', artist: 'Jessica Gonzalez', image: require('../images/ArtistProfile/Image72.png') },

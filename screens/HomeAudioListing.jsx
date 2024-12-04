@@ -120,8 +120,7 @@ export default function HomeAudioListing() {
       </View>
 
       <View style={styles.khoangCach}>
-        <Text style={styles.mauNhat}>{language === 'English' ? 'Good morning,' : 'Chào buổi sáng,'}</Text>
-        <Text style={styles.inDam}>Ashley Scott</Text>
+        <Text style={styles.mauNhat}>{language === 'English' ? 'Good morning' : 'Chào buổi sáng'}</Text>
       </View>
 
       <View style={styles.txtFeildContainer}>
