@@ -84,17 +84,17 @@ const commentsData = [
             },
             {
                 id: '3-2',
-                userName: 'Liam Pham',
-                userImage: require('../images/FeedCommentOnAnAudio/Avatar11.png'),
+                userName: 'Sally Rooney',
+                userImage: require('../images/FeedCommentOnAnAudio/Avatar8.png'),
                 commentText: 'Commodo 🔥',
                 time: '48m',
                 likes: 1,
             },
             {
                 id: '3-3',
-                userName: 'Liam Pham',
-                userImage: require('../images/FeedCommentOnAnAudio/Avatar11.png'),
-                commentText: 'Commodo 🔥',
+                userName: 'Sally Rooney',
+                userImage: require('../images/FeedCommentOnAnAudio/Avatar8.png'),
+                commentText: 'I love it',
                 time: '48m',
                 likes: 1,
             }
@@ -119,6 +119,9 @@ const FeedScreen = () => {
     const [commentInput, setCommentInput] = useState(""); // Nội dung comment
     const [comments, setComments] = useState(commentsData); // Danh sách các comment
 
+    const [replyInput, setReplyInput] = useState(""); // Nội dung reply
+    const [activeCommentId, setActiveCommentId] = useState(null); // ID comment được reply
+
     const handleAddComment = () => {
         if (commentInput.trim() === "") return; // Không cho phép gửi comment rỗng
       
@@ -135,6 +138,30 @@ const FeedScreen = () => {
         setComments((prevComments) => [newComment, ...prevComments]); // Thêm comment mới vào đầu danh sách
         setCommentInput(""); // Reset nội dung nhập
     };
+      
+    const handleAddReply = (commentId) => {
+        if (replyInput.trim() === "") return; // Không cho phép gửi reply rỗng
+      
+        const newReply = {
+          id: `${commentId}-${Math.random().toString(36).substring(7)}`, // Tạo ID duy nhất
+          userName: "Current User", // Tên người dùng hiện tại (có thể thay bằng động)
+          userImage: require('../images/FeedCommentOnAnAudio/Avatar13.png'), // Avatar
+          commentText: replyInput, // Nội dung nhập
+          time: "Just now", // Thời gian đăng
+          likes: 0, // Lượt thích
+        };
+      
+        setComments((prevComments) =>
+          prevComments.map((comment) =>
+            comment.id === commentId
+              ? { ...comment, replies: [newReply, ...comment.replies] }
+              : comment
+          )
+        );
+      
+        setReplyInput(""); // Reset nội dung nhập
+        setActiveCommentId(null); // Đóng ô nhập reply
+      };
       
 
     const renderItem = ({ item }) => (
@@ -212,7 +239,7 @@ const FeedScreen = () => {
                 <View style={styles.commentDetails}>
                   <Text style={styles.commentTime}>{item.time}</Text>
                   <Text style={styles.commentLikes}>{item.likes} like</Text>
-                  <TouchableOpacity>
+                  <TouchableOpacity onPress={() => setActiveCommentId(item.id)}>
                     <Text style={styles.replyText}>Reply</Text>
                   </TouchableOpacity>
                 </View>
@@ -232,7 +259,7 @@ const FeedScreen = () => {
                     <View style={styles.replyContent}>
                       <View style={styles.subReplyContent}>
                         <Text style={styles.replyUserName}>{reply.userName}</Text>
-                        <Text style={styles.replyText}>{reply.commentText}</Text>
+                        <Text style={styles.replyTextC}>{reply.commentText}</Text>
                       </View>
                       <View style={styles.replyDetails}>
                         <Text style={styles.replyTime}>{reply.time}</Text>
@@ -442,8 +469,8 @@ const styles = StyleSheet.create({
     commentContainer: {
         flexDirection: 'row',
         alignItems: 'flex-start',
-        marginTop: 20,
-        moreBottom: 20,
+        marginTop: 10,
+        moreBottom: 10,
     },
     commentUserImage: {
         width: 40,
@@ -522,7 +549,7 @@ const styles = StyleSheet.create({
     replyContainer: {
         flexDirection: "row",
         alignItems: "flex-start",
-        marginBottom: 10,
+        marginBottom: 15,
     },
     replyUserImage: {
         width: 30,
@@ -544,7 +571,7 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         color: "#333",
     },
-    replyText: {
+    replyTextC: {
         color: "#333",
         marginLeft: 5,
     },
