@@ -103,7 +103,7 @@ export default function MyLibrary() {
       {/* Navigation Buttons */}
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Playlists')}>
-          <Text style={styles.buttonText}>Playlists</Text>
+          <Text style={styles.buttonText}>Playlist</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('NewTag')}>
           <Text style={styles.buttonText}>New Tag</Text>

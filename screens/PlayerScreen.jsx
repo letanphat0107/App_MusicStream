@@ -2,46 +2,65 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image, StyleSheet, Alert, Animated, ImageBackground, ActivityIndicator } from 'react-native';
 import { Audio } from 'expo-av';
 import Slider from '@react-native-community/slider';
-import { Play, Pause, ChevronRight, ChevronLeft, Shuffle, Repeat, FastForward, Rewind, Volume } from 'lucide-react-native';
+import { Play, Pause, Volume, ArrowBigRight, ArrowBigLeft } from 'lucide-react-native';
 
 export default function PlayerScreen({ route }) {
-  const { song, playlist } = route.params;
+  const { song, playlist } = route.params; 
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [sound, setSound] = useState();
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isBuffering, setIsBuffering] = useState(false);
-  const [isShuffle, setIsShuffle] = useState(false);
-  const [isRepeat, setIsRepeat] = useState(false);
-  const [volume, setVolume] = useState(1); // Volume state (1 = max volume, 0 = min)
-  const [showVolumeControl, setShowVolumeControl] = useState(false); // Control visibility of the volume slider
+  const [currentSongIndex, setCurrentSongIndex] = useState(playlist.findIndex(s => s.id === song.id)); // Track the current song index
+  const [volume, setVolume] = useState(1); 
   const soundRef = useRef();
-  const rotation = useRef(new Animated.Value(0)).current; // Animated rotation value
+  const rotation = useRef(new Animated.Value(0)).current;
+  const fadeAnim = useRef(new Animated.Value(0)).current; 
+  const zoomAnim = useRef(new Animated.Value(1)).current; 
+  const buttonShakeAnim = useRef(new Animated.Value(0)).current; 
+  const backgroundFadeAnim = useRef(new Animated.Value(0)).current; 
 
   useEffect(() => {
     loadSound();
+    Animated.timing(fadeAnim, {
+      toValue: 1,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
 
-    // Start rotating the avatar when the component mounts
+    Animated.timing(zoomAnim, {
+      toValue: 1.1,
+      duration: 1000,
+      useNativeDriver: true,
+    }).start();
+
     Animated.loop(
       Animated.timing(rotation, {
         toValue: 1,
-        duration: 10000, // Complete one full rotation every 10 seconds
+        duration: 10000,
         useNativeDriver: true,
       })
     ).start();
+
+    Animated.timing(backgroundFadeAnim, {
+      toValue: 1,
+      duration: 2000,
+      useNativeDriver: true,
+    }).start();
 
     return () => {
       if (soundRef.current) {
         soundRef.current.unloadAsync();
       }
     };
-  }, [song]);
+  }, [currentSongIndex]); 
 
   const loadSound = async () => {
     try {
       const { sound, status } = await Audio.Sound.createAsync(
-        song.audio,
-        { shouldPlay: isPlaying, positionMillis: position, volume },
+        playlist[currentSongIndex].audio,
+        { shouldPlay: isPlaying, volume },
         onPlaybackStatusUpdate
       );
       soundRef.current = sound;
@@ -55,81 +74,48 @@ export default function PlayerScreen({ route }) {
   const onPlaybackStatusUpdate = (status) => {
     setPosition(status.positionMillis);
     setIsBuffering(status.isBuffering);
-
-    if (status.didJustFinish) {
-      if (isRepeat) {
-        soundRef.current.playAsync(); // Replay the same song
-      } else {
-        skipForward(); // Automatically skip to the next song when finished
-      }
-    }
   };
 
   const togglePlayback = async () => {
     if (soundRef.current) {
-      try {
-        if (isPlaying) {
-          await soundRef.current.pauseAsync();
-        } else {
-          await soundRef.current.playAsync();
-        }
-        setIsPlaying(!isPlaying);
-      } catch (error) {
-        Alert.alert('Error', 'Unable to toggle playback. Please try again later.');
+      if (isPlaying) {
+        await soundRef.current.pauseAsync();
+      } else {
+        await soundRef.current.playAsync();
       }
-    } else {
-      // If sound is not loaded, load it and play
-      await loadSound();
+      setIsPlaying(!isPlaying);
     }
   };
 
-  const skipForward = async () => {
-    try {
-      const nextIndex = isShuffle
-        ? Math.floor(Math.random() * playlist.length)
-        : playlist.findIndex(item => item.id === song.id) + 1;
-      if (nextIndex < playlist.length) {
-        const nextSong = playlist[nextIndex];
-        setPosition(0);
-        setIsPlaying(false);
-        route.params.song = nextSong;
-        loadSound();
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Unable to skip forward. Please try again later.');
-    }
+  const handleNext = () => {
+    const nextIndex = (currentSongIndex + 1) % playlist.length;
+    setCurrentSongIndex(nextIndex);
   };
 
-  const skipBackward = async () => {
-    try {
-      const prevIndex = playlist.findIndex(item => item.id === song.id) - 1;
-      if (prevIndex >= 0) {
-        const prevSong = playlist[prevIndex];
-        setPosition(0);
-        setIsPlaying(false);
-        route.params.song = prevSong;
-        loadSound();
-      }
-    } catch (error) {
-      Alert.alert('Error', 'Unable to skip backward. Please try again later.');
-    }
+  const handlePrevious = () => {
+    const prevIndex = (currentSongIndex - 1 + playlist.length) % playlist.length;
+    setCurrentSongIndex(prevIndex);
   };
 
-  const fastForward = () => {
-    const newPosition = Math.min(position + 10000, duration); // Fast forward by 10 seconds
-    setPosition(newPosition);
-    soundRef.current.setPositionAsync(newPosition);
+  const triggerButtonShake = () => {
+    Animated.sequence([
+      Animated.timing(buttonShakeAnim, {
+        toValue: -10,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(buttonShakeAnim, {
+        toValue: 10,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+      Animated.timing(buttonShakeAnim, {
+        toValue: 0,
+        duration: 100,
+        useNativeDriver: true,
+      }),
+    ]).start();
   };
-
-  const rewind = () => {
-    const newPosition = Math.max(position - 10000, 0); // Rewind by 10 seconds
-    setPosition(newPosition);
-    soundRef.current.setPositionAsync(newPosition);
-  };
-
-  const toggleShuffle = () => setIsShuffle(!isShuffle);
-
-  const toggleRepeat = () => setIsRepeat(!isRepeat);
 
   const formatDuration = (milliseconds) => {
     const minutes = Math.floor(milliseconds / 60000);
@@ -137,20 +123,13 @@ export default function PlayerScreen({ route }) {
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
-  const disableButtons = isBuffering || duration === 0;
-
   return (
     <View style={styles.container}>
-      <ImageBackground
-        source={song.image}
-        style={styles.backgroundImage}
-        blurRadius={10}
-      >
-        <View style={styles.overlay}>
-          {/* Rotating Avatar with Circular Border */}
-          <Animated.View style={styles.circleContainer}>
+      <ImageBackground source={playlist[currentSongIndex].image} style={styles.backgroundImage} blurRadius={10}>
+        <Animated.View style={[styles.overlay, { opacity: backgroundFadeAnim }]}>
+          <Animated.View style={[styles.circleContainer, { transform: [{ scale: zoomAnim }] }]}>
             <Animated.Image
-              source={song.image}
+              source={playlist[currentSongIndex].image}
               style={[
                 styles.songImage,
                 {
@@ -166,8 +145,8 @@ export default function PlayerScreen({ route }) {
               ]}
             />
           </Animated.View>
-          <Text style={styles.songTitle}>{song.title}</Text>
-          <Text style={styles.songArtist}>{song.artist}</Text>
+          <Animated.Text style={[styles.songTitle, { opacity: fadeAnim }]}>{playlist[currentSongIndex].title}</Animated.Text>
+          <Animated.Text style={[styles.songArtist, { opacity: fadeAnim }]}>{playlist[currentSongIndex].artist}</Animated.Text>
           <Text style={styles.songDuration}>
             {formatDuration(position)} / {formatDuration(duration)}
           </Text>
@@ -176,69 +155,51 @@ export default function PlayerScreen({ route }) {
             minimumValue={0}
             maximumValue={duration}
             value={position}
-            onValueChange={async (value) => {
-              setPosition(value);
-              await soundRef.current.setPositionAsync(value);
-            }}
+            onSlidingComplete={(value) => soundRef.current.setPositionAsync(value)}
             minimumTrackTintColor="#FF6347"
             maximumTrackTintColor="#FFFFFF"
             thumbTintColor="#FF6347"
           />
-          {isBuffering && (
-            <ActivityIndicator size="large" color="#FF6347" style={styles.loadingIndicator} />
-          )}
+          {isBuffering && <ActivityIndicator size="large" color="#FF6347" style={styles.loadingIndicator} />}
+          
           <View style={styles.controls}>
-            <TouchableOpacity onPress={skipBackward} disabled={disableButtons}>
-              <ChevronLeft color="white" size={45} />
+            <TouchableOpacity onPress={handlePrevious}>
+              <Animated.View style={{ transform: [{ translateX: buttonShakeAnim }] }}>
+                <ArrowBigLeft color="white" size={40} />
+              </Animated.View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={togglePlayback} disabled={disableButtons}>
-              {isPlaying ? <Pause color="white" size={60} /> : <Play color="white" size={60} />}
+            <TouchableOpacity onPress={togglePlayback}>
+              <Animated.View style={{ transform: [{ translateX: buttonShakeAnim }] }}>
+                {isPlaying ? <Pause color="white" size={60} /> : <Play color="white" size={60} />}
+              </Animated.View>
             </TouchableOpacity>
-            <TouchableOpacity onPress={skipForward} disabled={disableButtons}>
-              <ChevronRight color="white" size={45} />
-            </TouchableOpacity>
-          </View>
-          <View style={styles.extraControls}>
-            <TouchableOpacity onPress={toggleShuffle} disabled={disableButtons}>
-              <Shuffle color={isShuffle ? 'yellow' : 'white'} size={40} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={toggleRepeat} disabled={disableButtons}>
-              <Repeat color={isRepeat ? 'yellow' : 'white'} size={40} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={rewind} disabled={disableButtons}>
-              <Rewind color="white" size={40} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={fastForward} disabled={disableButtons}>
-              <FastForward color="white" size={40} />
+            <TouchableOpacity onPress={handleNext}>
+              <Animated.View style={{ transform: [{ translateX: buttonShakeAnim }] }}>
+                <ArrowBigRight color="white" size={40} />
+              </Animated.View>
             </TouchableOpacity>
           </View>
-          <TouchableOpacity
-            style={styles.volumeButton}
-            onPress={() => setShowVolumeControl(!showVolumeControl)}
-            disabled={disableButtons}
-          >
-            <Volume color="white" size={40} />
-          </TouchableOpacity>
-          {showVolumeControl && (
-            <View style={styles.volumeControl}>
-              <Slider
-                style={styles.slider}
-                minimumValue={0}
-                maximumValue={1}
-                value={volume}
-                onValueChange={async (value) => {
-                  setVolume(value);
-                  if (soundRef.current) {
-                    await soundRef.current.setVolumeAsync(value);
-                  }
-                }}
-                minimumTrackTintColor="#FF6347"
-                maximumTrackTintColor="#FFFFFF"
-                thumbTintColor="#FF6347"
-              />
-            </View>
-          )}
-        </View>
+
+          {/* Volume Control */}
+          <View style={styles.volumeControl}>
+            <Volume color="white" size={30} />
+            <Slider
+              style={styles.volumeSlider}
+              minimumValue={0}
+              maximumValue={1}
+              value={volume}
+              onValueChange={(value) => {
+                setVolume(value);
+                if (soundRef.current) {
+                  soundRef.current.setVolumeAsync(value);
+                }
+              }}
+              minimumTrackTintColor="#FF6347"
+              maximumTrackTintColor="#FFFFFF"
+              thumbTintColor="#FF6347"
+            />
+          </View>
+        </Animated.View>
       </ImageBackground>
     </View>
   );
@@ -250,7 +211,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#181818',
-    paddingHorizontal: 20,
   },
   backgroundImage: {
     flex: 1,
@@ -278,13 +238,6 @@ const styles = StyleSheet.create({
   songImage: {
     width: '100%',
     height: '100%',
-    borderRadius: 125,
-    borderWidth: 4,
-    borderColor: '#FF6347',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.8,
-    shadowRadius: 6,
   },
   songTitle: {
     fontSize: 24,
@@ -294,47 +247,35 @@ const styles = StyleSheet.create({
   },
   songArtist: {
     fontSize: 18,
-    color: 'gray',
+    color: 'white',
     marginBottom: 10,
-    fontStyle: 'italic',
   },
   songDuration: {
     fontSize: 16,
     color: 'white',
-    marginBottom: 20,
+    marginBottom: 10,
   },
   slider: {
-    width: '80%',
+    width: '90%',
     height: 40,
-    marginBottom: 20,
   },
   controls: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginVertical: 20,
-  },
-  extraControls: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
+    justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 20,
   },
+  volumeControl: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: 20,
+  },
+  volumeSlider: {
+    width: 150,
+    height: 40,
+    marginLeft: 10,
+  },
   loadingIndicator: {
     position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: [{ translateX: -30 }, { translateY: -30 }],
-  },
-  volumeButton: {
-    position: 'absolute',
-    bottom: 40,
-    right: 20,
-  },
-  volumeControl: {
-    position: 'absolute',
-    bottom: 100,
-    right: 20,
-    width: 200,
   },
 });
