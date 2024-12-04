@@ -28,7 +28,7 @@ const Stack = createStackNavigator();
 function AppNavigator() {
   return (
     <Stack.Navigator
-      initialRouteName="ArtistProfile"
+      initialRouteName="HomeAudioListing"
       screenOptions={{
         headerStyle: { backgroundColor: "#231b2e" },
         headerTintColor: "#fff",

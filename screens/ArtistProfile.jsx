@@ -90,53 +90,20 @@ const ArtistProfile = () => {
     }
   };
 
-  // Hàm phát tất cả các bài hát theo trình tự
-  const playAllTracks = async () => {
-    try {
-      if (isPlaying) {
-        await stopAllTracks();
-        return;
-      }
-      for (const track of popularTracks) {
-        const { sound } = await Audio.Sound.createAsync(track.audioUrl, { shouldPlay: true });
-        setSounds(prevSounds => ({ ...prevSounds, [track.id]: sound }));
-        setIsPlaying(true);
-        setCurrentTrackId(track.id);
-
-        // Đợi bài hát hiện tại kết thúc, sau đó phát bài hát tiếp theo
-        await sound.playAsync();
-        await sound.setOnPlaybackStatusUpdate(async (status) => {
-          if (status.didJustFinish && currentTrackId === track.id) {
-            if (popularTracks.indexOf(track) < popularTracks.length - 1) {
-              // Chuyển sang bài hát tiếp theo
-              const nextTrack = popularTracks[popularTracks.indexOf(track) + 1];
-              await playTrack(nextTrack.id, nextTrack.audioUrl);
-            } else {
-              // Nếu đã phát hết các bài hát, dừng lại
-              await stopAllTracks();
-            }
-          }
-        });
-      }
-    } catch (error) {
-      console.error('Error playing all tracks:', error);
-    }
-  };
-
-  // Hàm phát tất cả các bài hát theo thứ tự ngẫu nhiên
+  // Hàm phát tất cả các bài hát theo ngẫu nhiên
   const playRandomTracks = async () => {
     const shuffledTracks = [...popularTracks].sort(() => Math.random() - 0.5); // Trộn mảng ngẫu nhiên
     try {
-      if (isPlaying) {
-        await stopAllTracks();
-        return;
-      }
+      // Dừng tất cả track trước khi phát playlist mới
+      await stopAllTracks();
+  
+      // Kiểm tra trạng thái phát nhạc
       for (const track of shuffledTracks) {
         const { sound } = await Audio.Sound.createAsync(track.audioUrl, { shouldPlay: true });
         setSounds(prevSounds => ({ ...prevSounds, [track.id]: sound }));
         setIsPlaying(true);
         setCurrentTrackId(track.id);
-
+  
         // Đợi bài hát hiện tại kết thúc, sau đó phát bài hát tiếp theo
         await sound.playAsync();
         await sound.setOnPlaybackStatusUpdate(async (status) => {
@@ -156,14 +123,47 @@ const ArtistProfile = () => {
       console.error('Error playing random tracks:', error);
     }
   };
+  
+  // Hàm phát tất cả các bài hát theo thứ tự
+  const playAllTracks = async () => {
+    try {
+      // Dừng tất cả track trước khi phát playlist mới
+      await stopAllTracks();
+  
+      for (const track of popularTracks) {
+        const { sound } = await Audio.Sound.createAsync(track.audioUrl, { shouldPlay: true });
+        setSounds(prevSounds => ({ ...prevSounds, [track.id]: sound }));
+        setIsPlaying(true);
+        setCurrentTrackId(track.id);
+  
+        // Đợi bài hát hiện tại kết thúc, sau đó phát bài hát tiếp theo
+        await sound.playAsync();
+        await sound.setOnPlaybackStatusUpdate(async (status) => {
+          if (status.didJustFinish && currentTrackId === track.id) {
+            if (popularTracks.indexOf(track) < popularTracks.length - 1) {
+              // Chuyển sang bài hát tiếp theo
+              const nextTrack = popularTracks[popularTracks.indexOf(track) + 1];
+              await playTrack(nextTrack.id, nextTrack.audioUrl);
+            } else {
+              // Nếu đã phát hết các bài hát, dừng lại
+              await stopAllTracks();
+            }
+          }
+        });
+      }
+    } catch (error) {
+      console.error('Error playing all tracks:', error);
+    }
+  };
+  
 
 
   return (
     <ScrollView style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
+      {/* <View style={styles.header}>
         <FontAwesome name="chevron-left" size={24} color="black" />
-      </View>
+      </View> */}
 
       {/* Profile Section */}
       <View style={styles.profileSection}>
@@ -254,10 +254,10 @@ const ArtistProfile = () => {
 // Example data
 const popularTracks = [
   {id: 1, name: 'Let you free', artistName: 'Ryan Young', plays: '68M', duration: '03:35', image: require('../images/ArtistProfile/Image66.png'), audioUrl: require('../audio/AnhKhongCanDam-CaoNamThanh-4039734.mp3')},
-  {id: 2, name: 'Blinding Lights', artistName: 'Ryan Young', plays: '93M', duration: '04:39', image: require('../images/ArtistProfile/Image67.png'), audioUrl: require('../audio/AnhKhongCanDam-CaoNamThanh-4039734.mp3') },
-  {id: 3, name: 'Levitating', artistName: 'Ryan Young', plays: '9M', duration: '07:48', image: require('../images/ArtistProfile/Image68.png'), audioUrl: require('../audio/AnhKhongCanDam-CaoNamThanh-4039734.mp3') },
+  {id: 2, name: 'Blinding Lights', artistName: 'Ryan Young', plays: '93M', duration: '04:39', image: require('../images/ArtistProfile/Image67.png'), audioUrl: require('../audio/qzt1sl5h1y.mp3') },
+  {id: 3, name: 'Levitating', artistName: 'Ryan Young', plays: '9M', duration: '07:48', image: require('../images/ArtistProfile/Image68.png'), audioUrl: require('../audio/ThoiKhongSaiLech.mp3') },
   {id: 4, name: 'Astronaut in the Ocean', artistName: 'Ryan Young', plays: '23M', duration: '3:36', image: require('../images/ArtistProfile/Image69.png'), audioUrl: require('../audio/AnhKhongCanDam-CaoNamThanh-4039734.mp3') },
-  {id: 5, name: 'Dynamite', artistName: 'Ryan Young', plays: '10M', duration: '06:22', image: require('../images/ArtistProfile/Image70.png'), audioUrl: require('../audio/AnhKhongCanDam-CaoNamThanh-4039734.mp3') },
+  {id: 5, name: 'Dynamite', artistName: 'Ryan Young', plays: '10M', duration: '06:22', image: require('../images/ArtistProfile/Image70.png'), audioUrl: require('../audio/qzt1sl5h1y.mp3') },
 ];
 
 const albums = [
@@ -273,7 +273,7 @@ const fansAlsoLike = [
 ];
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: 'white', paddingHorizontal: 18 ,marginTop: 30},
+  container: { flex: 1, backgroundColor: 'white', paddingHorizontal: 18 , paddingTop: 30},
   header: { marginVertical: 10 },
   profileSection: { alignItems: 'center', marginBottom: 20},
   profileImage: { width: 250, height: 250, borderRadius: 50 },
