@@ -355,15 +355,15 @@ const popularTracks = [
 ];
 
 const albums = [
-  { title: 'ME', artist: 'Jessica Gonzalez', image: require('../images/ArtistProfile/Image71.png') },
-  { title: 'Magna nost', artist: 'Jessica Gonzalez', image: require('../images/ArtistProfile/Image72.png') },
-  { title: 'Proident', artist: 'Jessica Gonzalez', image: require('../images/ArtistProfile/Image77.png') },
+  { id: 1, title: 'ME', artist: 'Jessica Gonzalez', image: require('../images/ArtistProfile/Image71.png') },
+  { id: 2, title: 'Magna nost', artist: 'Jessica Gonzalez', image: require('../images/ArtistProfile/Image72.png') },
+  { id: 3, title: 'Proident', artist: 'Jessica Gonzalez', image: require('../images/ArtistProfile/Image77.png') },
 ];
 
 const fansAlsoLike = [
-  { name: 'Magna nost', artist: 'Jessica Gonzalez', image: require('../images/ArtistProfile/Image74.png') },
-  { name: 'Exercitatio', artist: 'Brian Harris', image: require('../images/ArtistProfile/Image75.png') },
-  { name: 'Tempor Any', artist: 'Tyler Ano', image: require('../images/ArtistProfile/Image76.png') },
+  { id: 1, name: 'Magna nost', artist: 'Jessica Gonzalez', image: require('../images/ArtistProfile/Image74.png') },
+  { id: 2, name: 'Exercitatio', artist: 'Brian Harris', image: require('../images/ArtistProfile/Image75.png') },
+  { id: 3, name: 'Tempor Any', artist: 'Tyler Ano', image: require('../images/ArtistProfile/Image76.png') },
 ];
 
 const styles = StyleSheet.create({
