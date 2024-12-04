@@ -28,7 +28,7 @@ const Stack = createStackNavigator();
 function AppNavigator() {
   return (
     <Stack.Navigator
-      initialRouteName="LoginScreen"
+      initialRouteName="ArtistProfile"
       screenOptions={{
         headerStyle: { backgroundColor: "#231b2e" },
         headerTintColor: "#fff",

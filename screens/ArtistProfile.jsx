@@ -224,7 +224,7 @@ const ArtistProfile = () => {
       {/* About Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>About</Text>
-        <Image source={require('../assets/all_images/Artist Profile/Image 73.png')} style={styles.aboutImage} />
+        <Image source={require('../images/ArtistProfile/Image73.png')} style={styles.aboutImage} />
         <Text style={styles.aboutText} numberOfLines={isExpanded ? undefined : 4}>
           Do in cupidatat aute et in officia aute laboris est Lorem est nisi dolor consequat voluptate duis irure. Veniam quis amet irure cillum elit aliquip sunt cillum cillum do aliqua voluptate ad non magna elit. Do ea na. Do in cupidatat aute et in officia aute laboris est Lorem est nisi dolor consequat voluptate duis irure.
           {isExpanded ? '' : '...'} 
@@ -253,23 +253,23 @@ const ArtistProfile = () => {
 
 // Example data
 const popularTracks = [
-  {id: 1, name: 'Let you free', artistName: 'Ryan Young', plays: '68M', duration: '03:35', image: require('../assets/all_images/Artist Profile/Image 66.png'), audioUrl: require('../assets/audio/Ghen-MINErikKhacHung-13305025.mp3')},
-  {id: 2, name: 'Blinding Lights', artistName: 'Ryan Young', plays: '93M', duration: '04:39', image: require('../assets/all_images/Artist Profile/Image 67.png'), audioUrl: require('../assets/audio/chamhoa.mp3') },
-  {id: 3, name: 'Levitating', artistName: 'Ryan Young', plays: '9M', duration: '07:48', image: require('../assets/all_images/Artist Profile/Image 68.png'), audioUrl: require('../assets/audio/CoEmCho-MINMrA-4928094.mp3') },
-  {id: 4, name: 'Astronaut in the Ocean', artistName: 'Ryan Young', plays: '23M', duration: '3:36', image: require('../assets/all_images/Artist Profile/Image 69.png'), audioUrl: require('../assets/audio/emmoilanguoiyeuanh.mp3') },
-  {id: 5, name: 'Dynamite', artistName: 'Ryan Young', plays: '10M', duration: '06:22', image: require('../assets/all_images/Artist Profile/Image 70.png'), audioUrl: require('../assets/audio/TrenTinhBanDuoiTinhYeu-MIN-6802163.mp3') },
+  {id: 1, name: 'Let you free', artistName: 'Ryan Young', plays: '68M', duration: '03:35', image: require('../images/ArtistProfile/Image66.png'), audioUrl: require('../audio/AnhKhongCanDam-CaoNamThanh-4039734.mp3')},
+  {id: 2, name: 'Blinding Lights', artistName: 'Ryan Young', plays: '93M', duration: '04:39', image: require('../images/ArtistProfile/Image67.png'), audioUrl: require('../audio/AnhKhongCanDam-CaoNamThanh-4039734.mp3') },
+  {id: 3, name: 'Levitating', artistName: 'Ryan Young', plays: '9M', duration: '07:48', image: require('../images/ArtistProfile/Image68.png'), audioUrl: require('../audio/AnhKhongCanDam-CaoNamThanh-4039734.mp3') },
+  {id: 4, name: 'Astronaut in the Ocean', artistName: 'Ryan Young', plays: '23M', duration: '3:36', image: require('../images/ArtistProfile/Image69.png'), audioUrl: require('../audio/AnhKhongCanDam-CaoNamThanh-4039734.mp3') },
+  {id: 5, name: 'Dynamite', artistName: 'Ryan Young', plays: '10M', duration: '06:22', image: require('../images/ArtistProfile/Image70.png'), audioUrl: require('../audio/AnhKhongCanDam-CaoNamThanh-4039734.mp3') },
 ];
 
 const albums = [
-  { title: 'ME', artist: 'Jessica Gonzalez', image: require('../assets/all_images/Artist Profile/Image 71.png') },
-  { title: 'Magna nost', artist: 'Jessica Gonzalez', image: require('../assets/all_images/Artist Profile/Image 72.png') },
-  { title: 'Proident', artist: 'Jessica Gonzalez', image: require('../assets/all_images/Artist Profile/Image 77.png') },
+  { title: 'ME', artist: 'Jessica Gonzalez', image: require('../images/ArtistProfile/Image71.png') },
+  { title: 'Magna nost', artist: 'Jessica Gonzalez', image: require('../images/ArtistProfile/Image72.png') },
+  { title: 'Proident', artist: 'Jessica Gonzalez', image: require('../images/ArtistProfile/Image77.png') },
 ];
 
 const fansAlsoLike = [
-  { name: 'Magna nost', artist: 'Jessica Gonzalez', image: require('../assets/all_images/Artist Profile/Image 74.png') },
-  { name: 'Exercitatio', artist: 'Brian Harris', image: require('../assets/all_images/Artist Profile/Image 75.png') },
-  { name: 'Tempor Any', artist: 'Tyler Ano', image: require('../assets/all_images/Artist Profile/Image 76.png') },
+  { name: 'Magna nost', artist: 'Jessica Gonzalez', image: require('../images/ArtistProfile/Image74.png') },
+  { name: 'Exercitatio', artist: 'Brian Harris', image: require('../images/ArtistProfile/Image75.png') },
+  { name: 'Tempor Any', artist: 'Tyler Ano', image: require('../images/ArtistProfile/Image76.png') },
 ];
 
 const styles = StyleSheet.create({
