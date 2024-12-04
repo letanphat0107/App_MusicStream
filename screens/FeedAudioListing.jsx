@@ -16,7 +16,7 @@ const feedData = [
         duration: '05:15',
         postTime: '3d',
         likes: 20,
-        comments: 3,
+        comments: 7,
         shares: 1,
     },
     {
@@ -37,33 +37,105 @@ const feedData = [
 
 const commentsData = [
     {
+        feedId: '1',
         id: '1',
         userName: 'Sally Rooney',
         userImage: require('../images/FeedCommentOnAnAudio/Avatar8.png'),
         commentText: 'Do duis cul 😍',
         time: '17h',
         likes: 1,
+        replies: [],
     },
     {
+        feedId: '1',
         id: '2',
         userName: 'Jason',
         userImage: require('../images/FeedCommentOnAnAudio/Avatar9.png'),
         commentText: 'Minim magna exc 😍',
         time: '48m',
         likes: 1,
+        replies: [
+            {
+                id: "2-1",
+                userName: "Michael Key",
+                userImage: require("../images/FeedCommentOnAnAudio/Avatar8.png"),
+                commentText: "@Jason Deserunt officia consectetur adipi",
+                time: "40m",
+                likes: 2,
+            },
+    ],
     },
     {
+        feedId: '1',
         id: '3',
         userName: 'Liam Pham',
         userImage: require('../images/FeedCommentOnAnAudio/Avatar11.png'),
         commentText: 'Commodo 🔥',
         time: '48m',
         likes: 1,
+        replies: [
+            {
+                id: '3-1',
+                userName: 'Kiran Glaucus',
+                userImage: require('../images/FeedCommentOnAnAudio/Avatar9.png'),
+                commentText: 'Esse cillum dolore eu fugiat nulla pariatur',
+                time: '40m',
+                likes: 1,
+            },
+            {
+                id: '3-2',
+                userName: 'Liam Pham',
+                userImage: require('../images/FeedCommentOnAnAudio/Avatar11.png'),
+                commentText: 'Commodo 🔥',
+                time: '48m',
+                likes: 1,
+            },
+            {
+                id: '3-3',
+                userName: 'Liam Pham',
+                userImage: require('../images/FeedCommentOnAnAudio/Avatar11.png'),
+                commentText: 'Commodo 🔥',
+                time: '48m',
+                likes: 1,
+            }
+        ],
     },
 ];
 
+function countComments(comments) {
+    let count = comments.length;
+    comments.forEach((comment) => {
+        if (comment.replies) {
+            count += comment.replies.length;
+        }
+    });
+    return count;
+}
+
 const FeedScreen = () => {
     const [showComments, setShowComments] = useState(false);
+    const [expandedReplies, setExpandedReplies] = useState({});
+
+    const [commentInput, setCommentInput] = useState(""); // Nội dung comment
+    const [comments, setComments] = useState(commentsData); // Danh sách các comment
+
+    const handleAddComment = () => {
+        if (commentInput.trim() === "") return; // Không cho phép gửi comment rỗng
+      
+        const newComment = {
+          id: (comments.length + 1).toString(), // Tạo ID mới
+          userName: "Current User", // Tên người dùng hiện tại (có thể thay bằng tên động)
+          userImage: require('../images/FeedCommentOnAnAudio/Avatar13.png'), // Avatar người dùng
+          commentText: commentInput, // Nội dung nhập
+          time: "Just now", // Thời gian đăng
+          likes: 0, // Số lượt thích ban đầu
+          replies: [], // Chưa có reply nào
+        };
+      
+        setComments((prevComments) => [newComment, ...prevComments]); // Thêm comment mới vào đầu danh sách
+        setCommentInput(""); // Reset nội dung nhập
+    };
+      
 
     const renderItem = ({ item }) => (
         <View style={styles.postContainer}>
@@ -117,28 +189,84 @@ const FeedScreen = () => {
         </View>
     );
 
-    const renderComment = ({ item }) => (
-        <View style={styles.commentContainer}>
-            <Image source={item.userImage } style={styles.commentUserImage} />
-            <View style={styles.commentContent}>
+    const renderComment = ({ item }) => {
+        const isExpanded = expandedReplies[item.id] || false;
+      
+        const handleToggleReplies = () => {
+          setExpandedReplies((prev) => ({
+            ...prev,
+            [item.id]: !isExpanded,
+          }));
+        };
+      
+        return (
+          <View>
+            {/* Bình luận chính */}
+            <View style={styles.commentContainer}>
+              <Image source={item.userImage} style={styles.commentUserImage} />
+              <View style={styles.commentContent}>
                 <View style={styles.subCommentContent}>
-                    <Text style={styles.commentUserName}>{item.userName}</Text>
-                    <Text style={styles.commentText}>{item.commentText}</Text>
+                  <Text style={styles.commentUserName}>{item.userName}</Text>
+                  <Text style={styles.commentText}>{item.commentText}</Text>
                 </View>
                 <View style={styles.commentDetails}>
-                    <Text style={styles.commentTime}>{item.time}</Text>
-                    <Text style={styles.commentLikes}>{item.likes} like</Text>
-                    <TouchableOpacity>
-                        <Text style={styles.replyText}>Reply</Text>
-                    </TouchableOpacity>
+                  <Text style={styles.commentTime}>{item.time}</Text>
+                  <Text style={styles.commentLikes}>{item.likes} like</Text>
+                  <TouchableOpacity>
+                    <Text style={styles.replyText}>Reply</Text>
+                  </TouchableOpacity>
                 </View>
-            </View>
-            <TouchableOpacity style={styles.likeButton}>
+              </View>
+              <TouchableOpacity style={styles.likeButton}>
                 <MaterialIcons name="thumb-up-off-alt" size={18} color="#aaa" />
-            </TouchableOpacity>
-        </View>
-    );
-
+              </TouchableOpacity>
+            </View>
+      
+            {/* Hiển thị Reply */}
+            {item.replies && (
+              <View style={styles.replySection}>
+                {/* Hiển thị 1 reply đầu tiên */}
+                {(!isExpanded ? item.replies.slice(0, 1) : item.replies).map((reply) => (
+                  <View key={reply.id} style={styles.replyContainer}>
+                    <Image source={reply.userImage} style={styles.replyUserImage} />
+                    <View style={styles.replyContent}>
+                      <View style={styles.subReplyContent}>
+                        <Text style={styles.replyUserName}>{reply.userName}</Text>
+                        <Text style={styles.replyText}>{reply.commentText}</Text>
+                      </View>
+                      <View style={styles.replyDetails}>
+                        <Text style={styles.replyTime}>{reply.time}</Text>
+                        <Text style={styles.replyLikes}>{reply.likes} like</Text>
+                        <TouchableOpacity>
+                          <Text style={styles.replyAction}>Reply</Text>
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+                ))}
+      
+                {/* Hiển thị nút "View X more replies" */}
+                {item.replies.length > 1 && !isExpanded && (
+                  <TouchableOpacity onPress={handleToggleReplies}>
+                    <Text style={styles.viewMoreReplies}>
+                      View {item.replies.length - 1} more reply
+                      {item.replies.length > 2 ? "ies" : "y"}
+                    </Text>
+                  </TouchableOpacity>
+                )}
+      
+                {/* Hiển thị nút "Hide replies" khi mở rộng */}
+                {isExpanded && (
+                  <TouchableOpacity onPress={handleToggleReplies}>
+                    <Text style={styles.viewMoreReplies}>Hide replies</Text>
+                  </TouchableOpacity>
+                )}
+              </View>
+            )}
+          </View>
+        );
+      };
+      
     return (
         <View style={styles.container}>
             {/* Header */}
@@ -151,14 +279,14 @@ const FeedScreen = () => {
             {showComments ? (
                 <View style={styles.commentsSection}>
                     <View style={styles.header}>
-                        <Text style={styles.commentsTitle}>3 comments</Text>
+                        <Text style={styles.commentsTitle}>{countComments(commentsData)} comments</Text>
                         <TouchableOpacity onPress={() => setShowComments(false)} style={styles.backButton}>
                             <Icon name="arrow-back" size={24} color="#333" />
                         </TouchableOpacity>
                     </View>
                     
                     <FlatList
-                        data={commentsData}
+                        data={comments}
                         keyExtractor={(item) => item.id}
                         renderItem={renderComment}
                         contentContainerStyle={styles.commentsList}
@@ -170,8 +298,10 @@ const FeedScreen = () => {
                             style={styles.commentInput}
                             placeholder="Write a comment..."
                             placeholderTextColor="#aaa"
+                            value={commentInput} // Kết nối với state
+                            onChangeText={setCommentInput} // Cập nhật nội dung nhập
                         />
-                        <TouchableOpacity style={styles.sendButton}>
+                        <TouchableOpacity style={styles.sendButton} onPress={handleAddComment}>
                             <Icon name="send" size={20} color="#555" />
                         </TouchableOpacity>
                     </View>
@@ -193,7 +323,6 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#fff',
         paddingHorizontal: 18,
-        marginTop: 30
     },
     header: {
         flexDirection: 'row',
@@ -313,7 +442,8 @@ const styles = StyleSheet.create({
     commentContainer: {
         flexDirection: 'row',
         alignItems: 'flex-start',
-        marginBottom: 40,
+        marginTop: 20,
+        moreBottom: 20,
     },
     commentUserImage: {
         width: 40,
@@ -382,6 +512,69 @@ const styles = StyleSheet.create({
     sendButton: {
         paddingHorizontal: 10,
     },
+    replySection: {
+        marginLeft: 50, // Lùi vào để thể hiện reply
+        borderLeftWidth: 1,
+        borderLeftColor: "#ddd",
+        paddingLeft: 10,
+        marginTop: 30,
+    },
+    replyContainer: {
+        flexDirection: "row",
+        alignItems: "flex-start",
+        marginBottom: 10,
+    },
+    replyUserImage: {
+        width: 30,
+        height: 30,
+        borderRadius: 15,
+    },
+    replyContent: {
+        flex: 1,
+        marginLeft: 10,
+        justifyContent: "flex-start",
+    },
+    subReplyContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'flex-start',
+    },
+    replyUserName: {
+        justifyContent: "flex-start",
+        fontWeight: "bold",
+        color: "#333",
+    },
+    replyText: {
+        color: "#333",
+        marginLeft: 5,
+    },
+    replyDetails: {
+        flexDirection: "row",
+        alignItems: "center",
+        marginTop: 4,
+    },
+    replyTime: {
+        fontSize: 12,
+        color: "#555",
+        marginRight: 10,
+    },
+    replyLikes: {
+        fontSize: 12,
+        color: "#555",
+        marginRight: 10,
+    },
+    replyAction: {
+        fontSize: 12,
+        color:   "#007bff",
+    },
+    viewMoreReplies: {
+        fontSize: 14,
+        color: "#007bff",
+        marginLeft: 50, // Căn lề để khớp với reply
+        marginTop: 8,
+    },
+
+
 });
 
 export default FeedScreen;
