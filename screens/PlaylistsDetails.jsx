@@ -129,30 +129,42 @@ export default function PlaylistsDetails() {
 const sampleSongs = [
   {
     id: '1',
-    title: 'FLOWER',
-    artist: 'Jessica Gonzalez',
-    duration: '2,1M . 3:36',
+    title: 'FLOWER\nJessica Gonzalez\n2,1M . 3:36',
     image: require('../images/MyLibrary/Image101.png'),
-    audio: require('../audio/qzt1sl5h1y.mp3'), // File audio
+    audio: require('../audio/DaoNuong.mp3'),
   },
   {
     id: '2',
-    title: 'Shape of You',
-    artist: 'Anthony Taylor',
-    duration: '68M . 3:35',
+    title: 'Shape of You\nAnthony Taylor\n68M . 03:35',
     image: require('../images/MyLibrary/Image102.png'),
     audio: require('../audio/AnhKhongCanDam-CaoNamThanh-4039734.mp3'),
   },
   {
-    id: '3',
-    title: 'Blingding Lights',
-    artist: 'Ashley Scott',
-    duration: '93M . 3:20',
-    image: require('../images/MyLibrary/Image103.png'),
-    audio: require('../audio/AnhKhongCanDam-CaoNamThanh-4039734.mp3'),
-  },
-];
+  id: '3',
+  title: 'Blingding Lights\nAshley Scott\n4 songs',
+  image: require('../images/MyLibrary/Image103.png'),
+  audio: require('../audio/ChiLaKhongCungNhau.mp3'),
+},
+{
+  id: '4',
+  title: 'Levitating\nAnthony Taylor\n9M . 07:48',
+  image: require('../images/MyLibrary/Image104.png'),
+  audio: require('../audio/LacTroi.mp3'),
+},
+{
+  id: '5',
+  title: 'Astronaut in the Ocean\nPedro Moreno\n23M . 3:36',
+  image: require('../images/MyLibrary/Image105.png'),
+  audio: require('../audio/ChiBangCaiGatDau.mp3'),
+},
+{
+  id: '6',
+  title: 'Dynamite\nElena Jimeneez\n10M . 06:22',
+  image: require('../images/MyLibrary/Image106.png'),
+  audio: require('../audio/ChiLaKhongCungNhau.mp3'),
+},
 
+];
 const styles = StyleSheet.create({
   container: {
     flex: 1,
