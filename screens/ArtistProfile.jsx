@@ -118,7 +118,8 @@ const ArtistProfile = () => {
         setCurrentTrack({
           id: track.id,
           name: track.name, // Tên bài hát
-          artistName: track.artist, // Nghệ sĩ
+          artistName: track.artistName, // Nghệ sĩ
+          image: track.image,
           audioUrl: track.audioUrl,
         });
   
@@ -172,7 +173,8 @@ const ArtistProfile = () => {
         setCurrentTrack({
           id: track.id,
           name: track.name, // Tên bài hát
-          artistName: track.artist, // Nghệ sĩ
+          artistName: track.artistName, // Nghệ sĩ
+          image: track.image,
           audioUrl: track.audioUrl,
         });
   
@@ -312,12 +314,18 @@ const ArtistProfile = () => {
       {/* Thanh điều khiển nhạc luôn hiển thị */}
       {currentTrack && (
         <View style={styles.nowPlayingContainer}>
-          <Text style={styles.nowPlayingTrackName}>{currentTrack.name}</Text>
-          <Text style={styles.nowPlayingArtist}>{currentTrack.artistName}</Text>
+          <View style={{flexDirection: 'row', justifyContent:"flex-start", flexWrap: 'nowrap', alignItems: 'center'}}>
+            <Image source={currentTrack.image} style={styles.trackImageNL} />
+            <View >
+              <Text style={styles.nowPlayingTrackName}>
+                {currentTrack.name.length > 30
+                  ? `${currentTrack.name.slice(0, 30)}...`
+                  : currentTrack.name}
+              </Text>
+              <Text style={styles.nowPlayingArtist}>{currentTrack.artistName}</Text>
+            </View>
+          </View>
           <View style={styles.nowPlayingControls}>
-            <TouchableOpacity onPress={nextTrack} style={styles.controlButton}>
-              <FontAwesome name="step-forward" size={24} color="white" />
-            </TouchableOpacity>
             {isPlaying ? (
               <TouchableOpacity onPress={pauseTrack} style={styles.controlButton}>
                 <FontAwesome name="pause" size={24} color="white" />
@@ -327,6 +335,9 @@ const ArtistProfile = () => {
                 <FontAwesome name="play" size={24} color="white" />
               </TouchableOpacity>
             )}
+            <TouchableOpacity onPress={nextTrack} style={styles.controlButton}>
+              <FontAwesome name="step-forward" size={24} color="white" />
+            </TouchableOpacity>
           </View>
         </View>
       )}
@@ -371,6 +382,7 @@ const styles = StyleSheet.create({
   sectionTitle: { fontSize: 22, fontWeight: 'bold', marginBottom: 10 },
   trackRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
   trackImage: { width: 60, height: 60, borderRadius: 5, marginRight: 10 },
+  trackImageNL: { width: 50, height: 50, borderRadius: 5, marginRight: 10 },
   trackInfo: { flex: 1 },
   trackName: { fontSize: 16 },
   trackArtistName:{ color: 'gray' },
@@ -396,7 +408,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     backgroundColor: '#181818',
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
     marginHorizontal: 3,
   },
   nowPlayingTrackName: { color: 'white', fontSize: 16 },
